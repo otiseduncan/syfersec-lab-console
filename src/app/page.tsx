@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
-type RiskLevel = 'Low' | 'Medium' | 'High' | 'Critical';
-type Severity = RiskLevel;
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type RiskLevel = 'Critical' | 'High' | 'Medium' | 'Low';
 type FindingStatus = 'Open' | 'In Review' | 'Planned' | 'Resolved' | 'Risk Accepted' | 'False Positive';
 type EventStatus = 'Open' | 'In Review' | 'Reviewed' | 'Resolved';
 
@@ -16,336 +17,1020 @@ interface Asset {
   riskLevel: RiskLevel;
   lastSeen: string;
   openPortsServices: string;
-  notes?: string;
+  notes: string;
 }
 
 interface Finding {
   id: string;
   title: string;
   affectedAsset: string;
-  severity: Severity;
+  severity: RiskLevel;
   status: FindingStatus;
   description: string;
   evidenceNotes: string;
   recommendation: string;
   remediationAction: string;
-  owner?: string;
-  dueDate?: string;
+  owner: string;
+  dueDate: string;
 }
 
 interface SecurityEvent {
   id: string;
   eventType: string;
+  relatedAsset: string;
   sourceIP: string;
   destinationIP: string;
-  relatedAsset?: string;
-  severity: Severity;
+  severity: RiskLevel;
   status: EventStatus;
   time: string;
   notes: string;
 }
 
-// Helper for severity colors
-const severityColor = (severity: Severity): string => {
-  switch (severity) {
-    case 'Critical': return 'bg-red-500/10 text-red-400';
-    case 'High': return 'bg-orange-500/10 text-orange-400';
-    case 'Medium': return 'bg-yellow-500/10 text-yellow-400';
-    case 'Low': return 'bg-cyan-500/10 text-cyan-400';
-    default: return 'bg-slate-500/10 text-slate-400';
+// ─── Seed Data ────────────────────────────────────────────────────────────────
+
+const SEED_ASSETS: Asset[] = [
+  {
+    id: 'asset-1',
+    hostname: 'kali-purple-lab',
+    ip: '192.168.50.105',
+    os: 'Kali Purple',
+    environment: 'Security Lab',
+    riskLevel: 'Medium',
+    lastSeen: '2026-04-25',
+    openPortsServices: '22/tcp SSH, 80/tcp HTTP',
+    notes: 'Primary attacker/analyst workstation for lab exercises.',
+  },
+  {
+    id: 'asset-2',
+    hostname: 'metasploitable2',
+    ip: '192.168.50.100',
+    os: 'Ubuntu Linux',
+    environment: 'Vulnerable Target',
+    riskLevel: 'Critical',
+    lastSeen: '2026-04-24',
+    openPortsServices: '21/tcp FTP, 22/tcp SSH, 139/tcp SMB, 445/tcp SMB',
+    notes: 'Intentionally vulnerable VM. Isolated from production network.',
+  },
+  {
+    id: 'asset-3',
+    hostname: 'windows-test-host',
+    ip: '192.168.50.120',
+    os: 'Windows Server',
+    environment: 'Test Target',
+    riskLevel: 'High',
+    lastSeen: '2026-04-23',
+    openPortsServices: '3389/tcp RDP, 445/tcp SMB',
+    notes: 'Windows test target for AD and SMB enumeration exercises.',
+  },
+];
+
+const SEED_FINDINGS: Finding[] = [
+  {
+    id: 'finding-1',
+    title: 'Anonymous FTP Access Detected',
+    affectedAsset: 'metasploitable2',
+    severity: 'Critical',
+    status: 'Open',
+    description: 'FTP service on port 21 allows unauthenticated anonymous login. Any user can read and potentially write files without credentials.',
+    evidenceNotes: 'Verified via: ftp 192.168.50.100 → login as "anonymous". Directory listing exposed /var/ftp/ contents.',
+    recommendation: 'Disable anonymous FTP access. If FTP is required, enforce authentication and consider switching to SFTP.',
+    remediationAction: 'Edit /etc/vsftpd.conf: set anonymous_enable=NO. Restart vsftpd service.',
+    owner: 'Otis Duncan',
+    dueDate: '2026-05-01',
+  },
+  {
+    id: 'finding-2',
+    title: 'SMB Service Exposed in Lab Network',
+    affectedAsset: 'metasploitable2',
+    severity: 'High',
+    status: 'In Review',
+    description: 'SMB ports 139 and 445 are open and accessible. Samba version may be vulnerable to known exploits including MS17-010 variants.',
+    evidenceNotes: 'Nmap script: smb-vuln-ms17-010 showed potential exposure. enum4linux confirmed open shares.',
+    recommendation: 'Patch Samba to latest version. Restrict SMB to necessary hosts via firewall. Disable SMBv1.',
+    remediationAction: 'apt update && apt upgrade samba. Edit smb.conf to restrict network access.',
+    owner: 'Otis Duncan',
+    dueDate: '2026-05-05',
+  },
+  {
+    id: 'finding-3',
+    title: 'RDP Exposed on Windows Test Host',
+    affectedAsset: 'windows-test-host',
+    severity: 'High',
+    status: 'Planned',
+    description: 'Remote Desktop Protocol (RDP) on port 3389 is reachable from the lab subnet. Weak or default credentials increase brute-force risk.',
+    evidenceNotes: 'Nmap confirmed 3389/tcp open. NLA not enforced. No account lockout policy detected.',
+    recommendation: 'Enable Network Level Authentication (NLA). Implement account lockout. Restrict RDP access via firewall rules.',
+    remediationAction: 'Enable NLA via Group Policy. Set account lockout threshold to 5 attempts.',
+    owner: 'Otis Duncan',
+    dueDate: '2026-05-10',
+  },
+];
+
+const SEED_EVENTS: SecurityEvent[] = [
+  {
+    id: 'event-1',
+    eventType: 'Port Scan',
+    relatedAsset: 'metasploitable2',
+    sourceIP: '192.168.50.105',
+    destinationIP: '192.168.50.100',
+    severity: 'Medium',
+    status: 'Reviewed',
+    time: '2026-04-24 14:22:10',
+    notes: 'SYN scan from kali-purple-lab targeting metasploitable2. Lab exercise — authorized.',
+  },
+  {
+    id: 'event-2',
+    eventType: 'Authentication Attempt',
+    relatedAsset: 'metasploitable2',
+    sourceIP: '192.168.50.105',
+    destinationIP: '192.168.50.100',
+    severity: 'High',
+    status: 'Open',
+    time: '2026-04-24 15:05:33',
+    notes: 'SSH brute-force attempt using Hydra from kali-purple-lab. Lab exercise targeting metasploitable2.',
+  },
+  {
+    id: 'event-3',
+    eventType: 'Service Enumeration',
+    relatedAsset: 'windows-test-host',
+    sourceIP: '192.168.50.105',
+    destinationIP: '192.168.50.120',
+    severity: 'Medium',
+    status: 'In Review',
+    time: '2026-04-25 09:40:17',
+    notes: 'SMB enumeration using enum4linux and crackmapexec. Discovered open shares and hostname.',
+  },
+];
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+const generateId = () => `id-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+
+const riskBadge = (level: RiskLevel): string => {
+  switch (level) {
+    case 'Critical': return 'bg-red-500/15 text-red-400 border border-red-500/30';
+    case 'High':     return 'bg-orange-500/15 text-orange-400 border border-orange-500/30';
+    case 'Medium':   return 'bg-yellow-500/15 text-yellow-400 border border-yellow-500/30';
+    case 'Low':      return 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30';
   }
 };
 
+const statusBadge = (status: FindingStatus | EventStatus): string => {
+  switch (status) {
+    case 'Open':          return 'bg-red-500/15 text-red-400 border border-red-500/30';
+    case 'In Review':     return 'bg-yellow-500/15 text-yellow-400 border border-yellow-500/30';
+    case 'Planned':       return 'bg-blue-500/15 text-blue-400 border border-blue-500/30';
+    case 'Resolved':      return 'bg-green-500/15 text-green-400 border border-green-500/30';
+    case 'Risk Accepted': return 'bg-purple-500/15 text-purple-400 border border-purple-500/30';
+    case 'False Positive':return 'bg-slate-500/15 text-slate-400 border border-slate-500/30';
+    case 'Reviewed':      return 'bg-green-500/15 text-green-400 border border-green-500/30';
+  }
+};
+
+const isOpenFinding = (status: FindingStatus) =>
+  !['Resolved', 'Risk Accepted', 'False Positive'].includes(status);
+
+const isOpenEvent = (status: EventStatus) =>
+  !['Reviewed', 'Resolved'].includes(status);
+
+// ─── Input / Label helpers ────────────────────────────────────────────────────
+
+const inputCls = 'w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-500 transition-colors';
+const labelCls = 'block text-xs text-slate-400 mb-1 font-medium';
+const selectCls = 'w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-teal-500 transition-colors';
+
+type Tab = 'dashboard' | 'assets' | 'findings' | 'events' | 'import' | 'planning' | 'report';
+
+// ─── Main Component ───────────────────────────────────────────────────────────
+
 export default function SyferSecConsole() {
-  const [assets, setAssets] = useState<Asset[]>([
-    { id: 'asset-1', hostname: 'ubuntu-lab', ip: '192.168.50.10', os: 'Ubuntu Linux 22.04', environment: 'Lab', riskLevel: 'Medium', lastSeen: '2026-04-24', openPortsServices: '22/tcp SSH, 80/tcp HTTP, 443/tcp HTTPS', notes: 'Development server' },
-    { id: 'asset-2', hostname: 'windows-test', ip: '192.168.50.20', os: 'Windows Server 2022', environment: 'Production', riskLevel: 'High', lastSeen: '2026-04-23', openPortsServices: '445/tcp SMB, 3389/tcp RDP', notes: '' },
-    { id: 'asset-3', hostname: 'web-server', ip: '192.168.50.30', os: 'Debian 12', environment: 'Lab', riskLevel: 'Critical', lastSeen: '2026-04-25', openPortsServices: '80/tcp HTTP, 443/tcp HTTPS', notes: 'Public facing web server' },
-  ]);
+  const [assets, setAssets]   = useState<Asset[]>(SEED_ASSETS);
+  const [findings, setFindings] = useState<Finding[]>(SEED_FINDINGS);
+  const [events, setEvents]   = useState<SecurityEvent[]>(SEED_EVENTS);
 
-  const [findings, setFindings] = useState<Finding[]>([
-    {
-      id: 'finding-1', title: 'Unpatched OpenSSH Vulnerability', affectedAsset: 'ubuntu-lab', severity: 'Critical', status: 'Open',
-      description: 'OpenSSH 8.2p1 is vulnerable to CVE-2024-XXXX allowing remote code execution.',
-      evidenceNotes: 'Nmap version scan + manual verification confirmed vulnerable version.',
-      recommendation: 'Upgrade OpenSSH to the latest patched version immediately.',
-      remediationAction: 'sudo apt update && sudo apt upgrade openssh-server',
-      owner: 'Security Team', dueDate: '2026-05-01'
-    },
-    {
-      id: 'finding-2', title: 'SMBv1 Enabled', affectedAsset: 'windows-test', severity: 'High', status: 'In Review',
-      description: 'SMB version 1 protocol is enabled and exposed.',
-      evidenceNotes: 'Enum4linux and nmap script output.',
-      recommendation: 'Disable SMBv1 and enforce SMBv3 only.',
-      remediationAction: 'Disable via registry and restart server.',
-      owner: 'IT Admin', dueDate: '2026-04-30'
-    },
-  ]);
+  const [currentTab, setCurrentTab] = useState<Tab>('dashboard');
 
-  const [events, setEvents] = useState<SecurityEvent[]>([
-    { id: 'event-1', eventType: 'Failed Login Attempt', sourceIP: '203.0.113.45', destinationIP: '192.168.50.10', relatedAsset: 'ubuntu-lab', severity: 'Medium', status: 'Open', time: '2026-04-25 09:15:22', notes: 'Multiple SSH brute-force attempts from external IP.' },
-    { id: 'event-2', eventType: 'Port Scan Detected', sourceIP: '198.51.100.22', destinationIP: '192.168.50.30', relatedAsset: 'web-server', severity: 'High', status: 'Reviewed', time: '2026-04-24 14:30:10', notes: 'Nmap SYN scan on ports 80/443.' },
-  ]);
-
-  const [currentTab, setCurrentTab] = useState<'dashboard' | 'assets' | 'findings' | 'events' | 'report' | 'import' | 'planning'>('dashboard');
-  const [showAddAssetModal, setShowAddAssetModal] = useState(false);
-  const [showAddFindingModal, setShowAddFindingModal] = useState(false);
-  const [showAddEventModal, setShowAddEventModal] = useState(false);
-
+  // Asset state
+  const [selectedAssetId, setSelectedAssetId] = useState<string>(SEED_ASSETS[0].id);
+  const [assetRiskFilter, setAssetRiskFilter] = useState<'All' | RiskLevel>('All');
+  const [showAddAssetForm, setShowAddAssetForm] = useState(false);
   const [newAsset, setNewAsset] = useState<Partial<Asset>>({});
-  const [newFinding, setNewFinding] = useState<Partial<Finding>>({});
-  const [newEvent, setNewEvent] = useState<Partial<SecurityEvent>>({});
+  const [assetError, setAssetError] = useState('');
 
-  const generateId = () => `id-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+  // Finding state
+  const [showAddFindingForm, setShowAddFindingForm] = useState(false);
+  const [newFinding, setNewFinding] = useState<Partial<Finding>>({});
+  const [findingError, setFindingError] = useState('');
+
+  // Event state
+  const [showAddEventForm, setShowAddEventForm] = useState(false);
+  const [newEvent, setNewEvent] = useState<Partial<SecurityEvent>>({});
+  const [eventError, setEventError] = useState('');
+
+  // CSV state
+  const [csvText, setCsvText] = useState('');
+  const [csvResult, setCsvResult] = useState('');
+
+  // ── Computed metrics ──
+  const totalAssets        = assets.length;
+  const highRiskAssets     = assets.filter(a => a.riskLevel === 'Critical' || a.riskLevel === 'High').length;
+  const openFindings       = findings.filter(f => isOpenFinding(f.status)).length;
+  const criticalFindings   = findings.filter(f => f.severity === 'Critical').length;
+  const eventsNeedReview   = events.filter(e => isOpenEvent(e.status)).length;
+
+  // ── Derived ──
+  const selectedAsset = useMemo(() => assets.find(a => a.id === selectedAssetId) ?? assets[0], [assets, selectedAssetId]);
+  const filteredAssets = useMemo(() =>
+    assetRiskFilter === 'All' ? assets : assets.filter(a => a.riskLevel === assetRiskFilter),
+    [assets, assetRiskFilter]
+  );
+
+  // ─── Handlers ──────────────────────────────────────────────────────────────
 
   const handleAddAsset = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newAsset.hostname || !newAsset.ip) return;
+    if (!newAsset.hostname || !newAsset.ip || !newAsset.os) {
+      setAssetError('Hostname, IP address, and OS are required.');
+      return;
+    }
     const asset: Asset = {
       id: generateId(),
-      hostname: newAsset.hostname!,
-      ip: newAsset.ip!,
-      os: newAsset.os || 'Unknown',
+      hostname: newAsset.hostname,
+      ip: newAsset.ip,
+      os: newAsset.os,
       environment: newAsset.environment || 'Lab',
       riskLevel: (newAsset.riskLevel as RiskLevel) || 'Medium',
       lastSeen: newAsset.lastSeen || new Date().toISOString().split('T')[0],
       openPortsServices: newAsset.openPortsServices || '',
       notes: newAsset.notes || '',
     };
-    setAssets(prev => [...prev, asset]);
+    setAssets(prev => [asset, ...prev]);
+    setSelectedAssetId(asset.id);
     setNewAsset({});
-    setShowAddAssetModal(false);
+    setAssetError('');
+    setShowAddAssetForm(false);
   };
 
   const handleAddFinding = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newFinding.title || !newFinding.affectedAsset) return;
+    if (!newFinding.title || !newFinding.remediationAction) {
+      setFindingError('Title and remediation action are required.');
+      return;
+    }
     const finding: Finding = {
       id: generateId(),
-      title: newFinding.title!,
-      affectedAsset: newFinding.affectedAsset!,
-      severity: (newFinding.severity as Severity) || 'Medium',
+      title: newFinding.title,
+      affectedAsset: newFinding.affectedAsset || '',
+      severity: (newFinding.severity as RiskLevel) || 'Medium',
       status: (newFinding.status as FindingStatus) || 'Open',
       description: newFinding.description || '',
       evidenceNotes: newFinding.evidenceNotes || '',
       recommendation: newFinding.recommendation || '',
-      remediationAction: newFinding.remediationAction || '',
+      remediationAction: newFinding.remediationAction,
       owner: newFinding.owner || '',
       dueDate: newFinding.dueDate || '',
     };
-    setFindings(prev => [...prev, finding]);
+    setFindings(prev => [finding, ...prev]);
     setNewFinding({});
-    setShowAddFindingModal(false);
+    setFindingError('');
+    setShowAddFindingForm(false);
   };
 
   const handleAddEvent = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newEvent.eventType) return;
+    if (!newEvent.eventType || !newEvent.sourceIP || !newEvent.destinationIP) {
+      setEventError('Event type, source IP, and destination IP are required.');
+      return;
+    }
     const event: SecurityEvent = {
       id: generateId(),
-      eventType: newEvent.eventType!,
-      sourceIP: newEvent.sourceIP || '',
-      destinationIP: newEvent.destinationIP || '',
+      eventType: newEvent.eventType,
       relatedAsset: newEvent.relatedAsset || '',
-      severity: (newEvent.severity as Severity) || 'Medium',
+      sourceIP: newEvent.sourceIP,
+      destinationIP: newEvent.destinationIP,
+      severity: (newEvent.severity as RiskLevel) || 'Medium',
       status: (newEvent.status as EventStatus) || 'Open',
       time: newEvent.time || new Date().toLocaleString(),
       notes: newEvent.notes || '',
     };
-    setEvents(prev => [...prev, event]);
+    setEvents(prev => [event, ...prev]);
     setNewEvent({});
-    setShowAddEventModal(false);
+    setEventError('');
+    setShowAddEventForm(false);
   };
 
-  const updateFindingStatus = (id: string, status: FindingStatus) => {
+  const updateFindingStatus = (id: string, status: FindingStatus) =>
     setFindings(prev => prev.map(f => f.id === id ? { ...f, status } : f));
-  };
 
-  const updateEventStatus = (id: string, status: EventStatus) => {
+  const updateEventStatus = (id: string, status: EventStatus) =>
     setEvents(prev => prev.map(e => e.id === id ? { ...e, status } : e));
-  };
 
-  const parseCSV = (csvText: string): Asset[] => {
-    const lines = csvText.trim().split('\n');
-    if (lines.length < 2) return [];
-    const newAssets: Asset[] = [];
+  const handleCSVImport = () => {
+    const lines = csvText.trim().split('\n').filter(Boolean);
+    if (lines.length < 2) { setCsvResult('No data rows found. Include a header and at least one data row.'); return; }
+    const imported: Asset[] = [];
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i].trim();
       if (!line) continue;
-      const matches = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
-      const cleaned = matches.map(m => m.replace(/^"|"$/g, '').trim());
-      if (cleaned.length < 4) continue;
-      const [hostname, ip, os, risk, ports] = cleaned;
-      newAssets.push({
+      // Simple CSV parse: handle quoted fields
+      const cols: string[] = [];
+      let cur = '', inQuote = false;
+      for (const ch of line) {
+        if (ch === '"') { inQuote = !inQuote; }
+        else if (ch === ',' && !inQuote) { cols.push(cur.trim()); cur = ''; }
+        else { cur += ch; }
+      }
+      cols.push(cur.trim());
+      const [hostname, ip, os, risk, ports] = cols;
+      if (!hostname || !ip) continue;
+      imported.push({
         id: generateId(),
-        hostname: hostname || 'unknown',
-        ip: ip || '0.0.0.0',
+        hostname,
+        ip,
         os: os || 'Unknown',
         environment: 'Lab',
-        riskLevel: (risk as RiskLevel) || 'Medium',
+        riskLevel: (['Critical','High','Medium','Low'].includes(risk) ? risk : 'Medium') as RiskLevel,
         lastSeen: new Date().toISOString().split('T')[0],
         openPortsServices: ports || '',
         notes: 'Imported via CSV',
       });
     }
-    return newAssets;
-  };
-
-  const handleCSVImport = (csvText: string) => {
-    const imported = parseCSV(csvText);
     if (imported.length === 0) {
-      alert('No valid rows found in CSV. Check format.');
+      setCsvResult('No valid rows found. Check CSV format: hostname,ip,os,risk,ports');
       return;
     }
-    setAssets(prev => [...prev, ...imported]);
-    alert(`${imported.length} assets imported successfully!`);
+    setAssets(prev => [...imported, ...prev]);
+    setSelectedAssetId(imported[0].id);
+    setCsvResult(`✓ ${imported.length} asset(s) imported successfully.`);
+    setCsvText('');
   };
 
-  const totalAssets = assets.length;
-  const highRiskAssets = assets.filter(a => ['High', 'Critical'].includes(a.riskLevel)).length;
-  const openFindings = findings.filter(f => f.status === 'Open').length;
-  const criticalFindings = findings.filter(f => f.severity === 'Critical').length;
-  const eventsNeedingReview = events.filter(e => ['Open', 'In Review'].includes(e.status)).length;
+  // ─── Nav items ─────────────────────────────────────────────────────────────
 
-  const tabs = [
-    { id: 'dashboard', label: 'Dashboard' },
-    { id: 'assets', label: 'Assets' },
-    { id: 'findings', label: 'Findings' },
-    { id: 'events', label: 'Events' },
-    { id: 'report', label: 'Report' },
-    { id: 'import', label: 'Import CSV' },
-    { id: 'planning', label: 'Scan Planning' },
-  ] as const;
+  const navItems: { id: Tab; label: string; icon: string }[] = [
+    { id: 'dashboard', label: 'Dashboard',     icon: '⬡' },
+    { id: 'assets',    label: 'Asset Inventory', icon: '◈' },
+    { id: 'findings',  label: 'Findings',       icon: '◉' },
+    { id: 'events',    label: 'Events',          icon: '◎' },
+    { id: 'import',    label: 'Import CSV',      icon: '⊞' },
+    { id: 'planning',  label: 'Scan Planning',   icon: '◫' },
+    { id: 'report',    label: 'Report',          icon: '▤' },
+  ];
+
+  // ─── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex">
-      {/* Sidebar */}
-      <div className="w-64 bg-slate-900 border-r border-slate-700 flex flex-col print:hidden">
-        <div className="p-6 border-b border-slate-700">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-teal-500 rounded flex items-center justify-center text-white font-bold text-xl">S</div>
-            <h1 className="text-2xl font-semibold tracking-tight">SyferSec</h1>
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex print:block">
+
+      {/* ── Sidebar ── */}
+      <aside className="w-60 shrink-0 bg-slate-900 border-r border-white/10 flex flex-col print:hidden fixed top-0 left-0 h-full z-20">
+        {/* Logo */}
+        <div className="px-5 pt-6 pb-5 border-b border-white/10">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded bg-teal-500 flex items-center justify-center text-slate-900 font-black text-sm tracking-widest">SS</div>
+            <div>
+              <div className="text-sm font-bold tracking-wide text-slate-100">SyferSec</div>
+              <div className="text-xs text-slate-500 tracking-wider uppercase">Lab Console</div>
+            </div>
           </div>
-          <p className="text-xs text-slate-400 mt-1">Lab Console</p>
         </div>
 
-        <div className="flex-1 px-3 py-4">
-          {tabs.map(tab => (
+        {/* Nav */}
+        <nav className="flex-1 px-3 py-4 space-y-0.5">
+          {navItems.map(item => (
             <button
-              key={tab.id}
-              onClick={() => setCurrentTab(tab.id)}
-              className={`w-full text-left px-4 py-3 rounded-xl mb-1 flex items-center gap-3 transition-colors ${currentTab === tab.id ? 'bg-teal-500 text-white' : 'hover:bg-slate-800 text-slate-300'}`}
+              key={item.id}
+              onClick={() => setCurrentTab(item.id)}
+              className={`w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 text-sm transition-all ${
+                currentTab === item.id
+                  ? 'bg-teal-500/15 text-teal-400 border border-teal-500/25'
+                  : 'text-slate-400 hover:text-slate-100 hover:bg-white/5 border border-transparent'
+              }`}
             >
-              {tab.label}
+              <span className="text-base leading-none opacity-70">{item.icon}</span>
+              {item.label}
             </button>
           ))}
-        </div>
+        </nav>
 
-        <div className="p-4 border-t border-slate-700 text-xs text-slate-400">
-          Local-state MVP<br />Data resets on refresh
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        <div className="h-14 border-b border-slate-700 bg-slate-900 px-8 flex items-center justify-between print:hidden">
-          <h2 className="font-semibold text-xl capitalize">{currentTab}</h2>
-          <div className="flex items-center gap-4">
-            <div className="bg-amber-900/50 text-amber-300 text-xs px-3 py-1 rounded-full flex items-center gap-1">
-              <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></span>
-              Local-state MVP. Data resets on refresh until database persistence is added.
-            </div>
-            <div className="text-xs text-slate-400">Otis • Eatonton, GA</div>
+        {/* MVP Notice */}
+        <div className="px-4 py-4 border-t border-white/10">
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2.5 text-xs text-amber-400 leading-relaxed">
+            ⚠ Local-state MVP. Data resets on refresh until database persistence is added.
           </div>
         </div>
+      </aside>
 
-        <div className="flex-1 p-8 overflow-auto">
-          {/* DASHBOARD */}
+      {/* ── Main ── */}
+      <div className="flex-1 ml-60 flex flex-col print:ml-0">
+
+        {/* Top bar */}
+        <header className="h-14 bg-slate-900/80 border-b border-white/10 px-6 flex items-center justify-between sticky top-0 z-10 backdrop-blur print:hidden">
+          <div className="flex items-center gap-2 text-sm text-slate-400">
+            <span className="text-slate-600">SyferSec Lab Console</span>
+            <span className="text-slate-700">/</span>
+            <span className="text-slate-300 capitalize">{navItems.find(n => n.id === currentTab)?.label}</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 bg-red-500/10 border border-red-500/20 text-red-400 text-xs px-3 py-1.5 rounded-full">
+              <span className="w-1.5 h-1.5 bg-red-400 rounded-full animate-pulse"></span>
+              {criticalFindings} Critical
+            </div>
+            <button
+              onClick={() => window.print()}
+              className="bg-teal-500/10 border border-teal-500/25 text-teal-400 text-xs px-3 py-1.5 rounded-full hover:bg-teal-500/20 transition-colors"
+            >
+              ⎙ Print Report
+            </button>
+            <div className="text-xs text-slate-500">Otis Duncan · Portfolio MVP</div>
+          </div>
+        </header>
+
+        {/* Page content */}
+        <main className="flex-1 p-6 overflow-auto">
+
+          {/* ══ DASHBOARD ══════════════════════════════════════════════════ */}
           {currentTab === 'dashboard' && (
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
-              <div className="bg-slate-900 rounded-2xl p-6 border border-slate-700"><div className="text-slate-400 text-sm">Total Assets</div><div className="text-5xl font-semibold text-teal-400 mt-2">{totalAssets}</div></div>
-              <div className="bg-slate-900 rounded-2xl p-6 border border-slate-700"><div className="text-slate-400 text-sm">High-Risk Assets</div><div className="text-5xl font-semibold text-orange-400 mt-2">{highRiskAssets}</div></div>
-              <div className="bg-slate-900 rounded-2xl p-6 border border-slate-700"><div className="text-slate-400 text-sm">Open Findings</div><div className="text-5xl font-semibold text-red-400 mt-2">{openFindings}</div></div>
-              <div className="bg-slate-900 rounded-2xl p-6 border border-slate-700"><div className="text-slate-400 text-sm">Critical Findings</div><div className="text-5xl font-semibold text-red-500 mt-2">{criticalFindings}</div></div>
-              <div className="bg-slate-900 rounded-2xl p-6 border border-slate-700"><div className="text-slate-400 text-sm">Events Needing Review</div><div className="text-5xl font-semibold text-yellow-400 mt-2">{eventsNeedingReview}</div></div>
+            <div>
+              {/* Hero */}
+              <div className="mb-8">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div>
+                    <h1 className="text-2xl font-bold text-slate-100 tracking-tight">SyferSec Lab Console</h1>
+                    <p className="text-slate-400 mt-1 text-sm max-w-2xl">
+                      Security lab visibility for assets, findings, events, and evidence. Documents lab systems, open ports, vulnerability notes, remediation status, and security event activity.
+                    </p>
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {['Portfolio MVP', 'Defensive Security', 'Lab Tracking'].map(tag => (
+                        <span key={tag} className="text-xs bg-teal-500/10 border border-teal-500/20 text-teal-400 px-2.5 py-1 rounded-full">{tag}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => window.print()}
+                    className="bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors print:hidden"
+                  >
+                    ⎙ Print / Save PDF Report
+                  </button>
+                </div>
+              </div>
+
+              {/* Metric cards */}
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+                {[
+                  { label: 'Total Assets',         value: totalAssets,      color: 'text-teal-400',   dot: 'bg-teal-400' },
+                  { label: 'High-Risk Assets',      value: highRiskAssets,   color: 'text-orange-400', dot: 'bg-orange-400' },
+                  { label: 'Open Findings',         value: openFindings,     color: 'text-red-400',    dot: 'bg-red-400' },
+                  { label: 'Critical Findings',     value: criticalFindings, color: 'text-red-500',    dot: 'bg-red-500' },
+                  { label: 'Events Needing Review', value: eventsNeedReview, color: 'text-yellow-400', dot: 'bg-yellow-400' },
+                ].map(card => (
+                  <div key={card.label} className="bg-slate-900 border border-white/10 rounded-xl p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className={`w-2 h-2 rounded-full ${card.dot}`}></span>
+                      <span className="text-xs text-slate-500 uppercase tracking-wider">{card.label}</span>
+                    </div>
+                    <div className={`text-4xl font-bold ${card.color}`}>{card.value}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Quick summary tables */}
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="bg-slate-900 border border-white/10 rounded-xl p-5">
+                  <h3 className="text-sm font-semibold text-slate-300 mb-4">Recent Assets</h3>
+                  <div className="space-y-2">
+                    {assets.slice(0,5).map(a => (
+                      <div key={a.id} className="flex items-center justify-between text-sm">
+                        <span className="text-slate-300 font-mono">{a.hostname}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-slate-500 text-xs">{a.ip}</span>
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${riskBadge(a.riskLevel)}`}>{a.riskLevel}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="bg-slate-900 border border-white/10 rounded-xl p-5">
+                  <h3 className="text-sm font-semibold text-slate-300 mb-4">Open Findings</h3>
+                  <div className="space-y-2">
+                    {findings.filter(f => isOpenFinding(f.status)).slice(0,5).map(f => (
+                      <div key={f.id} className="flex items-center justify-between text-sm">
+                        <span className="text-slate-300 truncate max-w-[60%]">{f.title}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${riskBadge(f.severity)}`}>{f.severity}</span>
+                      </div>
+                    ))}
+                    {findings.filter(f => isOpenFinding(f.status)).length === 0 && (
+                      <p className="text-slate-500 text-xs">No open findings.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
-          {/* ASSETS */}
+          {/* ══ ASSETS ═════════════════════════════════════════════════════ */}
           {currentTab === 'assets' && (
             <div>
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-medium">Managed Assets ({assets.length})</h3>
-                <button onClick={() => setShowAddAssetModal(true)} className="bg-teal-500 hover:bg-teal-600 px-5 py-2 rounded-xl text-sm font-medium">+ Add Asset</button>
+              {/* Add Asset Form */}
+              <div className="bg-slate-900 border border-white/10 rounded-xl mb-6">
+                <button
+                  onClick={() => { setShowAddAssetForm(v => !v); setAssetError(''); }}
+                  className="w-full flex items-center justify-between px-5 py-4 text-sm font-semibold text-slate-300 hover:text-slate-100 transition-colors"
+                >
+                  <span>+ Add New Asset</span>
+                  <span className="text-slate-500">{showAddAssetForm ? '▲' : '▼'}</span>
+                </button>
+                {showAddAssetForm && (
+                  <form onSubmit={handleAddAsset} className="px-5 pb-5 border-t border-white/10 pt-5">
+                    {assetError && <p className="text-red-400 text-xs mb-4 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{assetError}</p>}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                      <div>
+                        <label className={labelCls} htmlFor="a-hostname">Hostname *</label>
+                        <input id="a-hostname" className={inputCls} value={newAsset.hostname || ''} onChange={e => setNewAsset(p => ({...p, hostname: e.target.value}))} placeholder="e.g. kali-vm-01" />
+                      </div>
+                      <div>
+                        <label className={labelCls} htmlFor="a-ip">IP Address *</label>
+                        <input id="a-ip" className={inputCls} value={newAsset.ip || ''} onChange={e => setNewAsset(p => ({...p, ip: e.target.value}))} placeholder="e.g. 192.168.50.10" />
+                      </div>
+                      <div>
+                        <label className={labelCls} htmlFor="a-os">Operating System *</label>
+                        <input id="a-os" className={inputCls} value={newAsset.os || ''} onChange={e => setNewAsset(p => ({...p, os: e.target.value}))} placeholder="e.g. Ubuntu Linux 22.04" />
+                      </div>
+                      <div>
+                        <label className={labelCls} htmlFor="a-env">Environment</label>
+                        <input id="a-env" className={inputCls} value={newAsset.environment || ''} onChange={e => setNewAsset(p => ({...p, environment: e.target.value}))} placeholder="e.g. Security Lab" />
+                      </div>
+                      <div>
+                        <label className={labelCls} htmlFor="a-risk">Risk Level</label>
+                        <select id="a-risk" className={selectCls} value={newAsset.riskLevel || 'Medium'} onChange={e => setNewAsset(p => ({...p, riskLevel: e.target.value as RiskLevel}))}>
+                          {(['Critical','High','Medium','Low'] as RiskLevel[]).map(r => <option key={r} value={r}>{r}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className={labelCls} htmlFor="a-lastseen">Last Seen</label>
+                        <input id="a-lastseen" type="date" className={inputCls} value={newAsset.lastSeen || ''} onChange={e => setNewAsset(p => ({...p, lastSeen: e.target.value}))} />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className={labelCls} htmlFor="a-ports">Open Ports / Services</label>
+                        <input id="a-ports" className={inputCls} value={newAsset.openPortsServices || ''} onChange={e => setNewAsset(p => ({...p, openPortsServices: e.target.value}))} placeholder="e.g. 22/tcp SSH, 80/tcp HTTP" />
+                      </div>
+                      <div>
+                        <label className={labelCls} htmlFor="a-notes">Notes</label>
+                        <input id="a-notes" className={inputCls} value={newAsset.notes || ''} onChange={e => setNewAsset(p => ({...p, notes: e.target.value}))} placeholder="Optional notes" />
+                      </div>
+                    </div>
+                    <div className="flex gap-3">
+                      <button type="submit" className="bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold text-sm px-5 py-2 rounded-lg transition-colors">Add Asset</button>
+                      <button type="button" onClick={() => { setShowAddAssetForm(false); setNewAsset({}); setAssetError(''); }} className="text-slate-400 hover:text-slate-200 text-sm px-4 py-2 rounded-lg border border-white/10 transition-colors">Cancel</button>
+                    </div>
+                  </form>
+                )}
               </div>
-              <div className="bg-slate-900 rounded-2xl border border-slate-700 overflow-hidden">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-slate-700 text-xs text-slate-400">
-                      <th className="text-left p-4">Hostname</th>
-                      <th className="text-left p-4">IP</th>
-                      <th className="text-left p-4">OS</th>
-                      <th className="text-left p-4">Environment</th>
-                      <th className="text-left p-4">Risk</th>
-                      <th className="text-left p-4">Last Seen</th>
-                      <th className="text-left p-4">Open Ports</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-700 text-sm">
-                    {assets.map(asset => (
-                      <tr key={asset.id}>
-                        <td className="p-4 font-medium">{asset.hostname}</td>
-                        <td className="p-4 text-slate-400">{asset.ip}</td>
-                        <td className="p-4 text-slate-400">{asset.os}</td>
-                        <td className="p-4 text-slate-400">{asset.environment}</td>
-                        <td className="p-4">
-                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${asset.riskLevel === 'Critical' ? 'bg-red-500/10 text-red-400' : asset.riskLevel === 'High' ? 'bg-orange-500/10 text-orange-400' : asset.riskLevel === 'Medium' ? 'bg-yellow-500/10 text-yellow-400' : 'bg-cyan-500/10 text-cyan-400'}`}>
-                            {asset.riskLevel}
-                          </span>
-                        </td>
-                        <td className="p-4 text-slate-400">{asset.lastSeen}</td>
-                        <td className="p-4 text-slate-400 text-xs">{asset.openPortsServices}</td>
-                      </tr>
+
+              {/* Filter */}
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-xs text-slate-500 mr-1">Filter:</span>
+                {(['All','Critical','High','Medium','Low'] as const).map(f => (
+                  <button
+                    key={f}
+                    onClick={() => setAssetRiskFilter(f)}
+                    className={`text-xs px-3 py-1.5 rounded-full border transition-all ${assetRiskFilter === f ? 'bg-teal-500/15 border-teal-500/30 text-teal-400' : 'border-white/10 text-slate-400 hover:text-slate-200'}`}
+                  >
+                    {f}
+                  </button>
+                ))}
+              </div>
+
+              {/* Asset list + detail */}
+              <div className="grid md:grid-cols-5 gap-6">
+                {/* List */}
+                <div className="md:col-span-3 bg-slate-900 border border-white/10 rounded-xl overflow-hidden">
+                  <div className="px-4 py-3 border-b border-white/10 text-xs text-slate-500 uppercase tracking-wider">
+                    {filteredAssets.length} Asset{filteredAssets.length !== 1 ? 's' : ''}
+                  </div>
+                  <div className="divide-y divide-white/5">
+                    {filteredAssets.map(asset => (
+                      <button
+                        key={asset.id}
+                        onClick={() => setSelectedAssetId(asset.id)}
+                        className={`w-full text-left px-4 py-3 flex items-center justify-between transition-colors ${
+                          selectedAssetId === asset.id ? 'bg-teal-500/10 border-l-2 border-l-teal-400' : 'hover:bg-white/5'
+                        }`}
+                      >
+                        <div>
+                          <div className="text-sm font-mono font-medium text-slate-200">{asset.hostname}</div>
+                          <div className="text-xs text-slate-500 mt-0.5">{asset.ip} · {asset.os}</div>
+                        </div>
+                        <span className={`text-xs px-2.5 py-1 rounded-full ${riskBadge(asset.riskLevel)}`}>{asset.riskLevel}</span>
+                      </button>
                     ))}
-                  </tbody>
-                </table>
+                    {filteredAssets.length === 0 && (
+                      <div className="p-6 text-sm text-slate-500 text-center">No assets match this filter.</div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Detail */}
+                {selectedAsset && (
+                  <div className="md:col-span-2 bg-slate-900 border border-white/10 rounded-xl p-5">
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <div className="font-mono font-bold text-slate-100">{selectedAsset.hostname}</div>
+                        <div className="text-xs text-slate-500 mt-0.5">{selectedAsset.environment}</div>
+                      </div>
+                      <span className={`text-xs px-2.5 py-1 rounded-full ${riskBadge(selectedAsset.riskLevel)}`}>{selectedAsset.riskLevel}</span>
+                    </div>
+                    <div className="space-y-3 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">IP Address</span>
+                        <span className="font-mono text-slate-300">{selectedAsset.ip}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">OS</span>
+                        <span className="text-slate-300">{selectedAsset.os}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Last Seen</span>
+                        <span className="text-slate-300">{selectedAsset.lastSeen}</span>
+                      </div>
+                    </div>
+                    {selectedAsset.openPortsServices && (
+                      <div className="mt-4">
+                        <div className="text-xs text-slate-500 mb-2">Open Ports / Services</div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {selectedAsset.openPortsServices.split(',').map(p => p.trim()).filter(Boolean).map((port, i) => (
+                            <span key={i} className="text-xs bg-slate-800 border border-white/10 text-slate-300 px-2 py-1 rounded font-mono">{port}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {selectedAsset.notes && (
+                      <div className="mt-4">
+                        <div className="text-xs text-slate-500 mb-1">Notes</div>
+                        <p className="text-xs text-slate-400 leading-relaxed">{selectedAsset.notes}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           )}
 
-          {/* FINDINGS */}
+          {/* ══ FINDINGS ═══════════════════════════════════════════════════ */}
           {currentTab === 'findings' && (
             <div>
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-medium">Security Findings ({findings.length})</h3>
-                <button onClick={() => setShowAddFindingModal(true)} className="bg-teal-500 hover:bg-teal-600 px-5 py-2 rounded-xl text-sm font-medium">+ Add Finding</button>
-              </div>
-              <div className="space-y-6">
-                {findings.map(finding => (
-                  <div key={finding.id} className="bg-slate-900 rounded-2xl p-6 border border-slate-700">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <div className="flex items-center gap-3">
-                          <span className={`px-3 py-1 text-xs font-semibold rounded-full ${finding.severity === 'Critical' ? 'bg-red-500 text-white' : finding.severity === 'High' ? 'bg-orange-500 text-white' : 'bg-yellow-500 text-slate-900'}`}>{finding.severity}</span>
-                          <h4 className="font-semibold">{finding.title}</h4>
-                        </div>
-                        <p className="text-sm text-slate-400 mt-1">Affected: <span className="font-medium">{finding.affectedAsset}</span></p>
+              {/* Add Finding Form */}
+              <div className="bg-slate-900 border border-white/10 rounded-xl mb-6">
+                <button
+                  onClick={() => { setShowAddFindingForm(v => !v); setFindingError(''); }}
+                  className="w-full flex items-center justify-between px-5 py-4 text-sm font-semibold text-slate-300 hover:text-slate-100 transition-colors"
+                >
+                  <span>+ Add New Finding</span>
+                  <span className="text-slate-500">{showAddFindingForm ? '▲' : '▼'}</span>
+                </button>
+                {showAddFindingForm && (
+                  <form onSubmit={handleAddFinding} className="px-5 pb-5 border-t border-white/10 pt-5">
+                    {findingError && <p className="text-red-400 text-xs mb-4 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{findingError}</p>}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div className="md:col-span-2">
+                        <label className={labelCls} htmlFor="f-title">Finding Title *</label>
+                        <input id="f-title" className={inputCls} value={newFinding.title || ''} onChange={e => setNewFinding(p => ({...p, title: e.target.value}))} placeholder="e.g. Anonymous FTP Access Detected" />
                       </div>
-                      <select value={finding.status} onChange={(e) => updateFindingStatus(finding.id, e.target.value as FindingStatus)} className="bg-slate-800 border border-slate-600 rounded-xl px-4 py-1 text-sm">
-                        {['Open','In Review','Planned','Resolved','Risk Accepted','False Positive'].map(s => <option key={s} value={s}>{s}</option>)}
-                      </select>
+                      <div>
+                        <label className={labelCls} htmlFor="f-asset">Affected Asset</label>
+                        <select id="f-asset" className={selectCls} value={newFinding.affectedAsset || ''} onChange={e => setNewFinding(p => ({...p, affectedAsset: e.target.value}))}>
+                          <option value="">— Select Asset —</option>
+                          {assets.map(a => <option key={a.id} value={a.hostname}>{a.hostname}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className={labelCls} htmlFor="f-sev">Severity</label>
+                        <select id="f-sev" className={selectCls} value={newFinding.severity || 'Medium'} onChange={e => setNewFinding(p => ({...p, severity: e.target.value as RiskLevel}))}>
+                          {(['Critical','High','Medium','Low'] as RiskLevel[]).map(r => <option key={r} value={r}>{r}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className={labelCls} htmlFor="f-status">Status</label>
+                        <select id="f-status" className={selectCls} value={newFinding.status || 'Open'} onChange={e => setNewFinding(p => ({...p, status: e.target.value as FindingStatus}))}>
+                          {(['Open','In Review','Planned','Resolved','Risk Accepted','False Positive'] as FindingStatus[]).map(s => <option key={s} value={s}>{s}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className={labelCls} htmlFor="f-owner">Owner</label>
+                        <input id="f-owner" className={inputCls} value={newFinding.owner || ''} onChange={e => setNewFinding(p => ({...p, owner: e.target.value}))} placeholder="e.g. Otis Duncan" />
+                      </div>
+                      <div>
+                        <label className={labelCls} htmlFor="f-due">Due Date</label>
+                        <input id="f-due" type="date" className={inputCls} value={newFinding.dueDate || ''} onChange={e => setNewFinding(p => ({...p, dueDate: e.target.value}))} />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className={labelCls} htmlFor="f-desc">Description</label>
+                        <textarea id="f-desc" rows={2} className={inputCls} value={newFinding.description || ''} onChange={e => setNewFinding(p => ({...p, description: e.target.value}))} placeholder="Describe the vulnerability or issue" />
+                      </div>
+                      <div>
+                        <label className={labelCls} htmlFor="f-evidence">Evidence Notes</label>
+                        <textarea id="f-evidence" rows={2} className={inputCls} value={newFinding.evidenceNotes || ''} onChange={e => setNewFinding(p => ({...p, evidenceNotes: e.target.value}))} placeholder="Tools used, output captured, screenshots, etc." />
+                      </div>
+                      <div>
+                        <label className={labelCls} htmlFor="f-rec">Recommendation</label>
+                        <textarea id="f-rec" rows={2} className={inputCls} value={newFinding.recommendation || ''} onChange={e => setNewFinding(p => ({...p, recommendation: e.target.value}))} placeholder="What should be done to mitigate this?" />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className={labelCls} htmlFor="f-rem">Remediation / Corrective Action *</label>
+                        <textarea id="f-rem" rows={2} className={inputCls} value={newFinding.remediationAction || ''} onChange={e => setNewFinding(p => ({...p, remediationAction: e.target.value}))} placeholder="Specific commands or steps to fix this" />
+                      </div>
                     </div>
-                    <div className="mt-6 grid grid-cols-2 gap-8 text-sm">
+                    <div className="flex gap-3">
+                      <button type="submit" className="bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold text-sm px-5 py-2 rounded-lg transition-colors">Add Finding</button>
+                      <button type="button" onClick={() => { setShowAddFindingForm(false); setNewFinding({}); setFindingError(''); }} className="text-slate-400 hover:text-slate-200 text-sm px-4 py-2 rounded-lg border border-white/10 transition-colors">Cancel</button>
+                    </div>
+                  </form>
+                )}
+              </div>
+
+              {/* Finding cards */}
+              <div className="space-y-4">
+                {findings.map(f => (
+                  <div key={f.id} className="bg-slate-900 border border-white/10 rounded-xl p-5">
+                    <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+                      <div className="flex items-center gap-3">
+                        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${riskBadge(f.severity)}`}>{f.severity}</span>
+                        <h3 className="font-semibold text-slate-100">{f.title}</h3>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className={`text-xs px-2.5 py-1 rounded-full ${statusBadge(f.status)}`}>{f.status}</span>
+                        <label className="sr-only" htmlFor={`fs-${f.id}`}>Update status for {f.title}</label>
+                        <select
+                          id={`fs-${f.id}`}
+                          value={f.status}
+                          onChange={e => updateFindingStatus(f.id, e.target.value as FindingStatus)}
+                          className="bg-slate-800 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-teal-500"
+                        >
+                          {(['Open','In Review','Planned','Resolved','Risk Accepted','False Positive'] as FindingStatus[]).map(s => <option key={s} value={s}>{s}</option>)}
+                        </select>
+                      </div>
+                    </div>
+
+                    {f.affectedAsset && (
+                      <p className="text-xs text-slate-500 mb-3">Asset: <span className="font-mono text-slate-400">{f.affectedAsset}</span>
+                        {f.owner && <> · Owner: <span className="text-slate-400">{f.owner}</span></>}
+                        {f.dueDate && <> · Due: <span className="text-slate-400">{f.dueDate}</span></>}
+                      </p>
+                    )}
+
+                    <div className="grid md:grid-cols-2 gap-5 text-sm">
                       <div>
-                        <div className="text-slate-400 mb-1">Description</div><p>{finding.description}</p>
-                        <div className="text-slate-400 mt-4 mb-1">Evidence</div><p className="text-slate-300">{finding.evidenceNotes}</p>
+                        {f.description && <>
+                          <div className="text-xs text-slate-500 uppercase tracking-wider mb-1">Description</div>
+                          <p className="text-slate-300 text-xs leading-relaxed">{f.description}</p>
+                        </>}
+                        {f.evidenceNotes && <div className="mt-3">
+                          <div className="text-xs text-slate-500 uppercase tracking-wider mb-1">Evidence Notes</div>
+                          <p className="text-slate-400 text-xs leading-relaxed">{f.evidenceNotes}</p>
+                        </div>}
                       </div>
                       <div>
-                        <div className="text-slate-400 mb-1">Recommendation</div><p className="text-teal-300">{finding.recommendation}</p>
-                        <div className="text-slate-400 mt-4 mb-1">Remediation Action</div>
-                        <p className="font-mono text-xs bg-slate-950 p-3 rounded-xl border border-slate-700">{finding.remediationAction}</p>
-                        {finding.dueDate && <div className="mt-4 text-xs text-slate-400">Due: {finding.dueDate}</div>}
+                        {f.recommendation && <>
+                          <div className="text-xs text-slate-500 uppercase tracking-wider mb-1">Recommendation</div>
+                          <p className="text-teal-300 text-xs leading-relaxed">{f.recommendation}</p>
+                        </>}
+                        {f.remediationAction && <div className="mt-3">
+                          <div className="text-xs text-slate-500 uppercase tracking-wider mb-1">Remediation Action</div>
+                          <pre className="text-xs font-mono bg-slate-950 border border-white/10 rounded-lg px-3 py-2 text-slate-300 whitespace-pre-wrap">{f.remediationAction}</pre>
+                        </div>}
                       </div>
+                    </div>
+                  </div>
+                ))}
+                {findings.length === 0 && (
+                  <div className="text-center text-slate-500 py-12">No findings recorded yet.</div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ══ EVENTS ═════════════════════════════════════════════════════ */}
+          {currentTab === 'events' && (
+            <div>
+              {/* Add Event Form */}
+              <div className="bg-slate-900 border border-white/10 rounded-xl mb-6">
+                <button
+                  onClick={() => { setShowAddEventForm(v => !v); setEventError(''); }}
+                  className="w-full flex items-center justify-between px-5 py-4 text-sm font-semibold text-slate-300 hover:text-slate-100 transition-colors"
+                >
+                  <span>+ Add Security Event</span>
+                  <span className="text-slate-500">{showAddEventForm ? '▲' : '▼'}</span>
+                </button>
+                {showAddEventForm && (
+                  <form onSubmit={handleAddEvent} className="px-5 pb-5 border-t border-white/10 pt-5">
+                    {eventError && <p className="text-red-400 text-xs mb-4 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{eventError}</p>}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                      <div className="md:col-span-2">
+                        <label className={labelCls} htmlFor="ev-type">Event Type *</label>
+                        <input id="ev-type" className={inputCls} value={newEvent.eventType || ''} onChange={e => setNewEvent(p => ({...p, eventType: e.target.value}))} placeholder="e.g. Port Scan, Auth Attempt" />
+                      </div>
+                      <div>
+                        <label className={labelCls} htmlFor="ev-asset">Related Asset</label>
+                        <select id="ev-asset" className={selectCls} value={newEvent.relatedAsset || ''} onChange={e => setNewEvent(p => ({...p, relatedAsset: e.target.value}))}>
+                          <option value="">— Select Asset —</option>
+                          {assets.map(a => <option key={a.id} value={a.hostname}>{a.hostname}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className={labelCls} htmlFor="ev-src">Source IP *</label>
+                        <input id="ev-src" className={inputCls} value={newEvent.sourceIP || ''} onChange={e => setNewEvent(p => ({...p, sourceIP: e.target.value}))} placeholder="e.g. 192.168.50.105" />
+                      </div>
+                      <div>
+                        <label className={labelCls} htmlFor="ev-dst">Destination IP *</label>
+                        <input id="ev-dst" className={inputCls} value={newEvent.destinationIP || ''} onChange={e => setNewEvent(p => ({...p, destinationIP: e.target.value}))} placeholder="e.g. 192.168.50.100" />
+                      </div>
+                      <div>
+                        <label className={labelCls} htmlFor="ev-sev">Severity</label>
+                        <select id="ev-sev" className={selectCls} value={newEvent.severity || 'Medium'} onChange={e => setNewEvent(p => ({...p, severity: e.target.value as RiskLevel}))}>
+                          {(['Critical','High','Medium','Low'] as RiskLevel[]).map(r => <option key={r} value={r}>{r}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className={labelCls} htmlFor="ev-status">Status</label>
+                        <select id="ev-status" className={selectCls} value={newEvent.status || 'Open'} onChange={e => setNewEvent(p => ({...p, status: e.target.value as EventStatus}))}>
+                          {(['Open','In Review','Reviewed','Resolved'] as EventStatus[]).map(s => <option key={s} value={s}>{s}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className={labelCls} htmlFor="ev-time">Time</label>
+                        <input id="ev-time" className={inputCls} value={newEvent.time || ''} onChange={e => setNewEvent(p => ({...p, time: e.target.value}))} placeholder="e.g. 2026-04-25 09:15:00" />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className={labelCls} htmlFor="ev-notes">Notes</label>
+                        <input id="ev-notes" className={inputCls} value={newEvent.notes || ''} onChange={e => setNewEvent(p => ({...p, notes: e.target.value}))} placeholder="Context, tool used, outcome, etc." />
+                      </div>
+                    </div>
+                    <div className="flex gap-3">
+                      <button type="submit" className="bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold text-sm px-5 py-2 rounded-lg transition-colors">Add Event</button>
+                      <button type="button" onClick={() => { setShowAddEventForm(false); setNewEvent({}); setEventError(''); }} className="text-slate-400 hover:text-slate-200 text-sm px-4 py-2 rounded-lg border border-white/10 transition-colors">Cancel</button>
+                    </div>
+                  </form>
+                )}
+              </div>
+
+              {/* Events table */}
+              <div className="bg-slate-900 border border-white/10 rounded-xl overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-white/10 text-xs text-slate-500 uppercase tracking-wider">
+                        <th className="text-left px-4 py-3">Event Type</th>
+                        <th className="text-left px-4 py-3">Source → Destination</th>
+                        <th className="text-left px-4 py-3">Asset</th>
+                        <th className="text-left px-4 py-3">Severity</th>
+                        <th className="text-left px-4 py-3">Time</th>
+                        <th className="text-left px-4 py-3">Notes</th>
+                        <th className="text-left px-4 py-3">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {events.map(ev => (
+                        <tr key={ev.id} className="hover:bg-white/3 transition-colors">
+                          <td className="px-4 py-3 font-medium text-slate-200">{ev.eventType}</td>
+                          <td className="px-4 py-3 font-mono text-xs text-slate-400">
+                            {ev.sourceIP} <span className="text-slate-600">→</span> {ev.destinationIP}
+                          </td>
+                          <td className="px-4 py-3 text-slate-400 text-xs">{ev.relatedAsset || '—'}</td>
+                          <td className="px-4 py-3">
+                            <span className={`text-xs px-2.5 py-1 rounded-full ${riskBadge(ev.severity)}`}>{ev.severity}</span>
+                          </td>
+                          <td className="px-4 py-3 text-xs text-slate-500">{ev.time}</td>
+                          <td className="px-4 py-3 text-xs text-slate-400 max-w-[180px] truncate" title={ev.notes}>{ev.notes || '—'}</td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-2">
+                              <span className={`text-xs px-2 py-0.5 rounded-full ${statusBadge(ev.status)}`}>{ev.status}</span>
+                              <label className="sr-only" htmlFor={`evs-${ev.id}`}>Update status</label>
+                              <select
+                                id={`evs-${ev.id}`}
+                                value={ev.status}
+                                onChange={e => updateEventStatus(ev.id, e.target.value as EventStatus)}
+                                className="bg-slate-800 border border-white/10 rounded px-2 py-1 text-xs text-slate-300 focus:outline-none focus:border-teal-500"
+                              >
+                                {(['Open','In Review','Reviewed','Resolved'] as EventStatus[]).map(s => <option key={s} value={s}>{s}</option>)}
+                              </select>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                      {events.length === 0 && (
+                        <tr><td colSpan={7} className="px-4 py-10 text-center text-slate-500">No events recorded.</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ══ IMPORT CSV ═════════════════════════════════════════════════ */}
+          {currentTab === 'import' && (
+            <div className="max-w-2xl">
+              <h2 className="text-lg font-bold mb-1">Import Scan CSV</h2>
+              <p className="text-slate-400 text-sm mb-6">Paste CSV data from a manual scan export to bulk-import assets into the console.</p>
+
+              <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3 text-sm text-amber-400 mb-6">
+                ⚠ Run scans only against systems you own or have explicit permission to test.
+              </div>
+
+              <div className="bg-slate-900 border border-white/10 rounded-xl p-6">
+                <div className="mb-4">
+                  <label className={labelCls} htmlFor="csv-area">Paste CSV Data</label>
+                  <textarea
+                    id="csv-area"
+                    rows={10}
+                    className={`${inputCls} font-mono`}
+                    value={csvText}
+                    onChange={e => { setCsvText(e.target.value); setCsvResult(''); }}
+                    placeholder={`hostname,ip,os,risk,ports\nubuntu-lab,192.168.50.10,Ubuntu Linux,Medium,"22/tcp SSH, 80/tcp HTTP"\nwindows-test,192.168.50.20,Windows Server,High,"445/tcp SMB, 3389/tcp RDP"`}
+                  />
+                </div>
+                <div className="mb-4 bg-slate-950 border border-white/10 rounded-lg p-3">
+                  <div className="text-xs text-slate-500 mb-1 uppercase tracking-wider">Expected format</div>
+                  <code className="text-xs font-mono text-slate-400">hostname,ip,os,risk,ports</code>
+                </div>
+                <button
+                  onClick={handleCSVImport}
+                  className="bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors w-full"
+                >
+                  Import Assets from CSV
+                </button>
+                {csvResult && (
+                  <div className={`mt-4 text-sm px-4 py-3 rounded-lg border ${csvResult.startsWith('✓') ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
+                    {csvResult}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ══ SCAN PLANNING ══════════════════════════════════════════════ */}
+          {currentTab === 'planning' && (
+            <div>
+              <h2 className="text-lg font-bold mb-1">Controlled Scan Profile Planning</h2>
+              <p className="text-slate-400 text-sm mb-2">Conceptual scan profiles for future backend implementation. No live scan execution.</p>
+              <div className="bg-slate-800/50 border border-white/10 rounded-lg px-4 py-2.5 text-xs text-slate-400 mb-6">
+                Scan execution is intentionally not enabled in this frontend MVP. These profiles are planning-only references.
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-5">
+                {[
+                  {
+                    name: 'Discovery',
+                    tag: 'Inventory',
+                    color: 'text-teal-400 border-teal-500/20 bg-teal-500/5',
+                    description: 'Identifies reachable hosts and basic lab visibility. Used for quick inventory review to confirm which systems are online and reachable.',
+                    details: ['ICMP ping sweep', 'ARP scan (LAN)', 'Top 100 common ports', 'OS fingerprinting (basic)'],
+                    use: 'Quick inventory review',
+                  },
+                  {
+                    name: 'Standard',
+                    tag: 'Documentation',
+                    color: 'text-blue-400 border-blue-500/20 bg-blue-500/5',
+                    description: 'Reviews common service exposure and basic version information. Used for routine lab documentation of running services.',
+                    details: ['Top 1000 ports', 'Service version detection', 'Banner grabbing', 'NSE default scripts'],
+                    use: 'Routine lab documentation',
+                  },
+                  {
+                    name: 'Deep Lab',
+                    tag: 'Authorized Targets',
+                    color: 'text-orange-400 border-orange-500/20 bg-orange-500/5',
+                    description: 'More thorough lab review for authorized isolated targets. Used when deeper service mapping is needed for vulnerability correlation.',
+                    details: ['All ports (1–65535)', 'Aggressive version detection', 'Vuln script category', 'OS and traceroute'],
+                    use: 'Deep service mapping on isolated VMs',
+                  },
+                  {
+                    name: 'Custom',
+                    tag: 'Future',
+                    color: 'text-purple-400 border-purple-500/20 bg-purple-500/5',
+                    description: 'Allows future custom scoping for authorized target ranges, port groups, and evidence notes. Intended for targeted exercises.',
+                    details: ['User-defined port ranges', 'Custom script selection', 'Configurable timing', 'Evidence note attachment'],
+                    use: 'Targeted authorized exercises',
+                  },
+                ].map(profile => (
+                  <div key={profile.name} className={`rounded-xl border p-5 ${profile.color}`}>
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <div className="font-bold tracking-wide">{profile.name}</div>
+                        <div className="text-xs opacity-60 mt-0.5 uppercase tracking-wider">{profile.tag}</div>
+                      </div>
+                      <span className="text-xs bg-slate-900/50 border border-white/10 px-2.5 py-1 rounded-full text-slate-400">Planning Only</span>
+                    </div>
+                    <p className="text-sm text-slate-300 leading-relaxed mb-4">{profile.description}</p>
+                    <div className="space-y-1.5 mb-4">
+                      {profile.details.map(d => (
+                        <div key={d} className="flex items-center gap-2 text-xs text-slate-400">
+                          <span className="w-1 h-1 rounded-full bg-current opacity-50"></span>
+                          {d}
+                        </div>
+                      ))}
+                    </div>
+                    <div className="text-xs text-slate-500">
+                      <span className="text-slate-600">Use case: </span>{profile.use}
                     </div>
                   </div>
                 ))}
@@ -353,96 +1038,185 @@ export default function SyferSecConsole() {
             </div>
           )}
 
-          {/* EVENTS - NOW FIXED */}
-          {currentTab === 'events' && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-medium">Security Events ({events.length})</h3>
-                <button onClick={() => setShowAddEventModal(true)} className="bg-teal-500 hover:bg-teal-600 px-5 py-2 rounded-xl text-sm font-medium">+ Add Event</button>
-              </div>
-              <div className="bg-slate-900 rounded-2xl border border-slate-700 overflow-hidden">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-slate-700 text-xs text-slate-400">
-                      <th className="text-left p-4">Event Type</th>
-                      <th className="text-left p-4">Source IP</th>
-                      <th className="text-left p-4">Dest IP</th>
-                      <th className="text-left p-4">Asset</th>
-                      <th className="text-left p-4">Severity</th>
-                      <th className="text-left p-4">Time</th>
-                      <th className="text-left p-4">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-700 text-sm">
-                    {events.map(event => (
-                      <tr key={event.id}>
-                        <td className="p-4">{event.eventType}</td>
-                        <td className="p-4 font-mono text-slate-400">{event.sourceIP}</td>
-                        <td className="p-4 font-mono text-slate-400">{event.destinationIP}</td>
-                        <td className="p-4 text-slate-400">{event.relatedAsset || '—'}</td>
-                        <td className="p-4">
-                          <span className={`px-3 py-1 text-xs rounded-full ${severityColor(event.severity)}`}>
-                            {event.severity}
-                          </span>
-                        </td>
-                        <td className="p-4 text-xs text-slate-400">{event.time}</td>
-                        <td className="p-4">
-                          <select value={event.status} onChange={(e) => updateEventStatus(event.id, e.target.value as EventStatus)} className="bg-slate-800 border border-slate-600 rounded-xl px-3 py-1 text-xs">
-                            {['Open','In Review','Reviewed','Resolved'].map(s => <option key={s} value={s}>{s}</option>)}
-                          </select>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* REPORT */}
+          {/* ══ REPORT ═════════════════════════════════════════════════════ */}
           {currentTab === 'report' && (
-            <div className="max-w-4xl mx-auto">
-              <button onClick={() => window.print()} className="print:hidden mb-8 mx-auto block bg-teal-500 hover:bg-teal-600 px-8 py-4 rounded-2xl text-sm font-medium">🖨️ Print / Save as PDF Report</button>
-              <div className="bg-white text-slate-900 p-12 print:p-8">
-                <div className="text-center border-b pb-8 mb-10">
-                  <h1 className="text-4xl font-bold text-teal-600">SyferSec Lab Console</h1>
-                  <p className="text-xl text-slate-600 mt-2">Security Assessment Report — {new Date().toLocaleDateString()}</p>
+            <div>
+              <div className="flex items-center justify-between mb-6 print:hidden">
+                <div>
+                  <h2 className="text-lg font-bold">Security Assessment Report</h2>
+                  <p className="text-slate-400 text-sm">Generated {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                 </div>
-                <h2 className="text-2xl font-semibold mb-4">Executive Summary</h2>
-                <p className="text-lg leading-relaxed">Environment contains {totalAssets} assets with {highRiskAssets} high/critical risk items. {openFindings} open findings ({criticalFindings} critical). {eventsNeedingReview} events need review.</p>
-                {/* More report sections omitted for space but fully functional */}
-                <div className="mt-16 text-center text-xs text-slate-400">Local-state MVP • Built for portfolio demonstration</div>
+                <button
+                  onClick={() => window.print()}
+                  className="bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors"
+                >
+                  ⎙ Print / Save as PDF
+                </button>
+              </div>
+
+              {/* Printable report body */}
+              <div className="bg-white text-slate-900 rounded-xl print:rounded-none p-8 max-w-4xl mx-auto print:max-w-none print:shadow-none print:p-6">
+                {/* Cover */}
+                <div className="border-b-2 border-teal-600 pb-8 mb-8">
+                  <div className="text-2xl font-black text-teal-700 tracking-tight">SyferSec Lab Console</div>
+                  <div className="text-lg font-semibold text-slate-700 mt-1">Security Assessment Report</div>
+                  <div className="text-sm text-slate-500 mt-2">
+                    Generated: {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}<br />
+                    Analyst: Otis Duncan · Portfolio Project · Defensive Security Lab
+                  </div>
+                </div>
+
+                {/* Executive Summary */}
+                <section className="mb-8">
+                  <h2 className="text-lg font-bold text-slate-800 mb-3 border-l-4 border-teal-500 pl-3">Executive Summary</h2>
+                  <p className="text-sm text-slate-700 leading-relaxed">
+                    This report documents the current security posture of the lab environment tracked within SyferSec Lab Console.
+                    The environment contains <strong>{totalAssets} tracked assets</strong>, of which <strong>{highRiskAssets} are rated High or Critical risk</strong>.
+                    There are currently <strong>{openFindings} open findings</strong>, including <strong>{criticalFindings} of Critical severity</strong>.
+                    <strong> {eventsNeedReview} security events</strong> require further review or action.
+                  </p>
+                  <p className="text-sm text-slate-600 mt-2 leading-relaxed">
+                    This is a cybersecurity portfolio project documenting practical lab exercises including asset tracking, vulnerability documentation, remediation planning, and security event review. This is a local-state MVP — data is not persisted to a database.
+                  </p>
+                </section>
+
+                {/* Asset Summary */}
+                <section className="mb-8">
+                  <h2 className="text-lg font-bold text-slate-800 mb-3 border-l-4 border-teal-500 pl-3">Asset Summary</h2>
+                  <table className="w-full text-sm border border-slate-200 rounded">
+                    <thead className="bg-slate-100">
+                      <tr>
+                        {['Hostname','IP','OS','Environment','Risk','Last Seen'].map(h => (
+                          <th key={h} className="text-left px-3 py-2 text-xs font-semibold text-slate-600 border-b border-slate-200">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {assets.map((a, i) => (
+                        <tr key={a.id} className={i % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
+                          <td className="px-3 py-2 font-mono text-xs">{a.hostname}</td>
+                          <td className="px-3 py-2 font-mono text-xs text-slate-600">{a.ip}</td>
+                          <td className="px-3 py-2 text-xs text-slate-600">{a.os}</td>
+                          <td className="px-3 py-2 text-xs text-slate-600">{a.environment}</td>
+                          <td className="px-3 py-2 text-xs font-semibold">{a.riskLevel}</td>
+                          <td className="px-3 py-2 text-xs text-slate-600">{a.lastSeen}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </section>
+
+                {/* Findings */}
+                <section className="mb-8">
+                  <h2 className="text-lg font-bold text-slate-800 mb-3 border-l-4 border-red-500 pl-3">Findings — Unresolved</h2>
+                  {findings.filter(f => isOpenFinding(f.status)).map(f => (
+                    <div key={f.id} className="mb-4 border border-slate-200 rounded p-4">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="font-semibold text-slate-800 text-sm">{f.title}</div>
+                        <div className="flex gap-2 text-xs shrink-0">
+                          <span className="font-semibold">[{f.severity}]</span>
+                          <span className="text-slate-500">{f.status}</span>
+                        </div>
+                      </div>
+                      <div className="text-xs text-slate-500 mt-1">Asset: {f.affectedAsset} {f.owner && `· Owner: ${f.owner}`} {f.dueDate && `· Due: ${f.dueDate}`}</div>
+                      {f.description && <p className="text-xs text-slate-700 mt-2">{f.description}</p>}
+                      {f.recommendation && <p className="text-xs text-teal-700 mt-1.5"><strong>Recommendation:</strong> {f.recommendation}</p>}
+                      {f.remediationAction && <p className="text-xs text-slate-600 mt-1 font-mono bg-slate-50 p-2 rounded">{f.remediationAction}</p>}
+                    </div>
+                  ))}
+                  {findings.filter(f => isOpenFinding(f.status)).length === 0 && (
+                    <p className="text-sm text-slate-500">No unresolved findings.</p>
+                  )}
+                </section>
+
+                {/* Events */}
+                <section className="mb-8">
+                  <h2 className="text-lg font-bold text-slate-800 mb-3 border-l-4 border-yellow-500 pl-3">Recent Security Events</h2>
+                  <table className="w-full text-sm border border-slate-200 rounded">
+                    <thead className="bg-slate-100">
+                      <tr>
+                        {['Type','Source → Dest','Asset','Severity','Status','Time'].map(h => (
+                          <th key={h} className="text-left px-3 py-2 text-xs font-semibold text-slate-600 border-b border-slate-200">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {events.map((ev, i) => (
+                        <tr key={ev.id} className={i % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
+                          <td className="px-3 py-2 text-xs">{ev.eventType}</td>
+                          <td className="px-3 py-2 font-mono text-xs text-slate-600">{ev.sourceIP} → {ev.destinationIP}</td>
+                          <td className="px-3 py-2 text-xs text-slate-600">{ev.relatedAsset || '—'}</td>
+                          <td className="px-3 py-2 text-xs font-semibold">{ev.severity}</td>
+                          <td className="px-3 py-2 text-xs text-slate-600">{ev.status}</td>
+                          <td className="px-3 py-2 text-xs text-slate-600">{ev.time}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </section>
+
+                {/* Recommendations */}
+                <section className="mb-8">
+                  <h2 className="text-lg font-bold text-slate-800 mb-3 border-l-4 border-teal-500 pl-3">Remediation Priorities</h2>
+                  <div className="space-y-2 text-sm text-slate-700">
+                    {findings.filter(f => isOpenFinding(f.status)).sort((a,b) => {
+                      const order = { Critical:0, High:1, Medium:2, Low:3 };
+                      return order[a.severity] - order[b.severity];
+                    }).map((f, i) => (
+                      <div key={f.id} className="flex gap-3">
+                        <span className="shrink-0 text-slate-400">{i+1}.</span>
+                        <span><strong>[{f.severity}]</strong> {f.title} — {f.affectedAsset}{f.dueDate ? ` (Due: ${f.dueDate})` : ''}</span>
+                      </div>
+                    ))}
+                    {findings.filter(f => isOpenFinding(f.status)).length === 0 && (
+                      <p className="text-slate-500">All findings are resolved or closed.</p>
+                    )}
+                  </div>
+                </section>
+
+                {/* Next steps */}
+                <section className="mb-8">
+                  <h2 className="text-lg font-bold text-slate-800 mb-3 border-l-4 border-slate-400 pl-3">Next Build Steps</h2>
+                  <div className="space-y-1.5 text-sm text-slate-700">
+                    {[
+                      'Add Supabase database persistence so data survives page refresh',
+                      'Implement user authentication and analyst accounts',
+                      'Add CSV/Nmap XML parser for real scan import pipeline',
+                      'Build API routes for backend integration',
+                      'Add file/screenshot upload for evidence attachment',
+                      'Implement email or Slack notification for critical findings',
+                      'Deploy to Vercel with environment-based config',
+                    ].map((step, i) => (
+                      <div key={i} className="flex gap-3">
+                        <span className="text-slate-400">□</span>
+                        <span>{step}</span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <div className="border-t border-slate-200 pt-4 text-xs text-slate-400 text-center">
+                  SyferSec Lab Console · Local-state MVP · Portfolio Project · Otis Duncan · {new Date().getFullYear()}
+                </div>
               </div>
             </div>
           )}
 
-          {/* IMPORT CSV */}
-          {currentTab === 'import' && (
-            <div className="max-w-2xl mx-auto bg-slate-900 rounded-3xl p-10 border border-slate-700">
-              <h3 className="text-2xl font-medium mb-4">Import Scan CSV</h3>
-              <p className="text-amber-300 mb-6">Run scans only against systems you own or have permission to test.</p>
-              <textarea id="csv-input" rows={10} className="w-full bg-slate-950 border border-slate-700 rounded-2xl p-6 font-mono text-sm" placeholder="hostname,ip,os,risk,ports&#10;example-server,192.168.1.10,Ubuntu,Medium,&quot;22,80&quot;" />
-              <button onClick={() => { const ta = document.getElementById('csv-input') as HTMLTextAreaElement; if (ta) handleCSVImport(ta.value); }} className="mt-6 w-full bg-teal-500 hover:bg-teal-600 py-5 rounded-2xl font-semibold">Import Assets</button>
-            </div>
-          )}
-
-          {/* SCAN PLANNING */}
-          {currentTab === 'planning' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {['Discovery', 'Standard', 'Deep Lab', 'Custom'].map(profile => (
-                <div key={profile} className="bg-slate-900 rounded-2xl p-8 border border-slate-700">
-                  <div className="text-teal-400 font-semibold mb-2">{profile.toUpperCase()}</div>
-                  <h4 className="text-xl font-medium">Scan Profile: {profile}</h4>
-                  <p className="text-slate-400 mt-6">Conceptual planning section — no live execution.</p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        </main>
       </div>
 
-      {/* Modals - Add Asset, Finding, Event (full forms available on request if needed) */}
-      {/* ... (Modals are the same as previous full version) */}
+      {/* Print styles */}
+      <style>{`
+        @media print {
+          body { background: white !important; color: black !important; }
+          .print\\:hidden { display: none !important; }
+          .print\\:block { display: block !important; }
+          .print\\:ml-0 { margin-left: 0 !important; }
+          aside { display: none !important; }
+          header { display: none !important; }
+          main { padding: 0 !important; }
+        }
+      `}</style>
     </div>
   );
 }
