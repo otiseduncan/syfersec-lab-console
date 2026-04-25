@@ -1,1179 +1,1074 @@
-'use client'
+'use client';
 
-import { useMemo, useState } from 'react'
+import React, { useState, useMemo } from 'react';
 
-type RiskLevel = 'Critical' | 'High' | 'Medium' | 'Low'
-type FindingStatus =
-  | 'Open'
-  | 'In Review'
-  | 'Planned'
-  | 'Resolved'
-  | 'Risk Accepted'
-  | 'False Positive'
-type EventStatus = 'Open' | 'In Review' | 'Reviewed' | 'Resolved'
+type RiskLevel = 'Critical' | 'High' | 'Medium' | 'Low';
+
+type FindingStatus = 
+  | 'Open' 
+  | 'In Review' 
+  | 'Planned' 
+  | 'Resolved' 
+  | 'Risk Accepted' 
+  | 'False Positive';
+
+type EventStatus = 
+  | 'Open' 
+  | 'In Review' 
+  | 'Reviewed' 
+  | 'Resolved';
 
 type Asset = {
-  id: number
-  hostname: string
-  ip: string
-  os: string
-  environment: string
-  risk: RiskLevel
-  lastSeen: string
-  ports: string[]
-}
+  id: string;
+  hostname: string;
+  ip: string;
+  os: string;
+  environment: string;
+  risk: RiskLevel;
+  lastSeen: string;
+  ports: string;
+  notes: string;
+};
 
 type Finding = {
-  id: number
-  title: string
-  asset: string
-  severity: RiskLevel
-  status: FindingStatus
-  description: string
-  remediation: string
-  evidence: string
-  recommendation: string
-}
+  id: string;
+  title: string;
+  affectedAssetId: string;
+  severity: RiskLevel;
+  status: FindingStatus;
+  description: string;
+  evidence: string;
+  recommendation: string;
+  remediation: string;
+  owner: string;
+  dueDate: string;
+};
 
 type SecurityEvent = {
-  id: number
-  type: string
-  source: string
-  destination: string
-  severity: RiskLevel
-  status: EventStatus
-  time: string
-  notes: string
-}
+  id: string;
+  eventType: string;
+  sourceIP: string;
+  destIP: string;
+  severity: RiskLevel;
+  status: EventStatus;
+  timestamp: string;
+  notes: string;
+  relatedAssetId: string;
+};
 
-const initialAssets: Asset[] = [
-  {
-    id: 1,
-    hostname: 'kali-purple-lab',
-    ip: '192.168.50.105',
-    os: 'Kali Purple',
-    environment: 'Security Lab',
-    risk: 'Medium',
-    lastSeen: 'Today',
-    ports: ['22/tcp SSH', '80/tcp HTTP'],
-  },
-  {
-    id: 2,
-    hostname: 'metasploitable2',
-    ip: '192.168.50.100',
-    os: 'Ubuntu Linux',
-    environment: 'Vulnerable Target',
-    risk: 'Critical',
-    lastSeen: 'Today',
-    ports: ['21/tcp FTP', '22/tcp SSH', '139/tcp SMB', '445/tcp SMB'],
-  },
-  {
-    id: 3,
-    hostname: 'windows-test-host',
-    ip: '192.168.50.120',
-    os: 'Windows Server',
-    environment: 'Test Target',
-    risk: 'High',
-    lastSeen: 'Yesterday',
-    ports: ['3389/tcp RDP', '445/tcp SMB'],
-  },
-]
+const severityColors: Record<RiskLevel, string> = {
+  Critical: 'bg-red-500/20 text-red-400 border-red-500/30',
+  High: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
+  Medium: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+  Low: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
+};
 
-const initialFindings: Finding[] = [
-  {
-    id: 1,
-    title: 'Anonymous FTP access detected',
-    asset: 'metasploitable2',
-    severity: 'Critical',
-    status: 'Open',
-    description:
-      'The target exposes FTP services and appears to allow anonymous access in the lab environment.',
-    remediation: 'Disable anonymous FTP and restrict access.',
-    evidence: 'Detected open TCP port 21 during service enumeration.',
-    recommendation:
-      'Disable anonymous FTP, require authenticated access, restrict FTP by firewall rule, and replace FTP with SFTP where possible.',
-  },
-  {
-    id: 2,
-    title: 'SMB service exposed in lab network',
-    asset: 'metasploitable2',
-    severity: 'High',
-    status: 'In Review',
-    description:
-      'SMB services are exposed on the target and should be reviewed for unnecessary shares or legacy protocol support.',
-    remediation: 'Validate shares, disable legacy SMB, restrict firewall rules.',
-    evidence: 'Detected open TCP ports 139 and 445.',
-    recommendation:
-      'Limit SMB access to trusted hosts, remove unnecessary shares, disable legacy SMB versions, and enforce host firewall restrictions.',
-  },
-  {
-    id: 3,
-    title: 'RDP exposed on Windows test host',
-    asset: 'windows-test-host',
-    severity: 'Medium',
-    status: 'Planned',
-    description:
-      'Remote Desktop is exposed on the Windows test host and should be limited to trusted administration sources.',
-    remediation: 'Limit RDP to trusted admin workstation.',
-    evidence: 'Detected open TCP port 3389.',
-    recommendation:
-      'Restrict RDP with firewall rules, require strong authentication, enable account lockout policy, and consider VPN-only administration.',
-  },
-]
+const statusColors: Record<FindingStatus | EventStatus, string> = {
+  Open: 'bg-red-500/20 text-red-400',
+  'In Review': 'bg-yellow-500/20 text-yellow-400',
+  Planned: 'bg-purple-500/20 text-purple-400',
+  Resolved: 'bg-green-500/20 text-green-400',
+  'Risk Accepted': 'bg-purple-500/20 text-purple-400',
+  'False Positive': 'bg-slate-500/20 text-slate-400',
+  Reviewed: 'bg-green-500/20 text-green-400',
+};
 
-const initialEvents: SecurityEvent[] = [
-  {
-    id: 1,
-    type: 'Port Scan',
-    source: '192.168.50.105',
-    destination: '192.168.50.100',
-    severity: 'Low',
-    status: 'Reviewed',
-    time: '09:15 AM',
-    notes: 'Authorized lab scan from Kali Purple to Metasploitable2.',
-  },
-  {
-    id: 2,
-    type: 'Authentication Attempt',
-    source: '192.168.50.105',
-    destination: '192.168.50.120',
-    severity: 'Medium',
-    status: 'Open',
-    time: '10:42 AM',
-    notes: 'Authentication activity requires review.',
-  },
-  {
-    id: 3,
-    type: 'Service Enumeration',
-    source: '192.168.50.105',
-    destination: '192.168.50.100',
-    severity: 'High',
-    status: 'In Review',
-    time: '11:08 AM',
-    notes: 'Service enumeration identified multiple exposed services.',
-  },
-]
+export default function SyferSecLabConsole() {
+  // State
+  const [assets, setAssets] = useState<Asset[]>([
+    {
+      id: 'a1',
+      hostname: 'ubuntu-lab-01',
+      ip: '192.168.50.10',
+      os: 'Ubuntu 22.04 LTS',
+      environment: 'Lab',
+      risk: 'Medium',
+      lastSeen: '2026-04-24',
+      ports: '22/tcp SSH, 80/tcp HTTP, 443/tcp HTTPS',
+      notes: 'Primary testing server',
+    },
+    {
+      id: 'a2',
+      hostname: 'win-test-02',
+      ip: '192.168.50.20',
+      os: 'Windows Server 2022',
+      environment: 'Lab',
+      risk: 'High',
+      lastSeen: '2026-04-23',
+      ports: '445/tcp SMB, 3389/tcp RDP, 135/tcp',
+      notes: 'Domain controller simulation',
+    },
+  ]);
 
-function severityClass(severity: string) {
-  switch (severity) {
-    case 'Critical':
-      return 'border-red-500/40 bg-red-500/10 text-red-300'
-    case 'High':
-      return 'border-orange-500/40 bg-orange-500/10 text-orange-300'
-    case 'Medium':
-      return 'border-yellow-500/40 bg-yellow-500/10 text-yellow-300'
-    default:
-      return 'border-cyan-500/40 bg-cyan-500/10 text-cyan-300'
-  }
-}
+  const [findings, setFindings] = useState<Finding[]>([
+    {
+      id: 'f1',
+      title: 'Outdated OpenSSL Version',
+      affectedAssetId: 'a1',
+      severity: 'High',
+      status: 'Open',
+      description: 'Server is running OpenSSL 1.1.1t which contains known vulnerabilities.',
+      evidence: 'nmap -sV output + vulners script results',
+      recommendation: 'Upgrade to OpenSSL 3.x or apply vendor patches.',
+      remediation: 'apt update && apt upgrade openssl',
+      owner: 'Security Analyst',
+      dueDate: '2026-05-01',
+    },
+  ]);
 
-function statusClass(status: string) {
-  switch (status) {
-    case 'Resolved':
-    case 'Reviewed':
-      return 'border-green-500/40 bg-green-500/10 text-green-300'
-    case 'Risk Accepted':
-      return 'border-purple-500/40 bg-purple-500/10 text-purple-300'
-    case 'False Positive':
-      return 'border-slate-500/40 bg-slate-500/10 text-slate-300'
-    case 'In Review':
-      return 'border-blue-500/40 bg-blue-500/10 text-blue-300'
-    case 'Planned':
-      return 'border-teal-500/40 bg-teal-500/10 text-teal-300'
-    default:
-      return 'border-yellow-500/40 bg-yellow-500/10 text-yellow-300'
-  }
-}
+  const [events, setEvents] = useState<SecurityEvent[]>([
+    {
+      id: 'e1',
+      eventType: 'Failed SSH Login',
+      sourceIP: '203.0.113.45',
+      destIP: '192.168.50.10',
+      severity: 'Medium',
+      status: 'Reviewed',
+      timestamp: '2026-04-24T14:30:00',
+      notes: 'Brute force attempt from known Tor exit node.',
+      relatedAssetId: 'a1',
+    },
+  ]);
 
-export default function Home() {
-  const [assetList, setAssetList] = useState<Asset[]>(initialAssets)
-  const [findingList, setFindingList] = useState<Finding[]>(initialFindings)
-  const [eventList, setEventList] = useState<SecurityEvent[]>(initialEvents)
-  const [selectedAsset, setSelectedAsset] = useState<Asset>(initialAssets[0])
-  const [assetFilter, setAssetFilter] = useState('All')
+  const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'assets' | 'findings' | 'events' | 'report' | 'planning'>('dashboard');
 
+  // Form states
+  const [showAddAsset, setShowAddAsset] = useState(false);
+  const [showAddFinding, setShowAddFinding] = useState(false);
+  const [showAddEvent, setShowAddEvent] = useState(false);
+  const [showImportCSV, setShowImportCSV] = useState(false);
+
+  // Asset form
   const [newAsset, setNewAsset] = useState({
     hostname: '',
     ip: '',
     os: '',
-    environment: 'Security Lab',
+    environment: 'Lab',
     risk: 'Medium' as RiskLevel,
-    lastSeen: 'Today',
+    lastSeen: new Date().toISOString().split('T')[0],
     ports: '',
-  })
+    notes: '',
+  });
 
+  // Finding form
   const [newFinding, setNewFinding] = useState({
     title: '',
-    asset: initialAssets[0].hostname,
+    affectedAssetId: '',
     severity: 'Medium' as RiskLevel,
     status: 'Open' as FindingStatus,
     description: '',
     evidence: '',
-    remediation: '',
     recommendation: '',
-  })
+    remediation: '',
+    owner: '',
+    dueDate: '',
+  });
 
+  // Event form
   const [newEvent, setNewEvent] = useState({
-    type: '',
-    source: '',
-    destination: '',
-    severity: 'Low' as RiskLevel,
+    eventType: '',
+    sourceIP: '',
+    destIP: '',
+    severity: 'Medium' as RiskLevel,
     status: 'Open' as EventStatus,
-    time: '',
+    timestamp: new Date().toISOString().slice(0, 16),
     notes: '',
-  })
+    relatedAssetId: '',
+  });
 
-  function handleAddAsset(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
+  // CSV import
+  const [csvInput, setCsvInput] = useState('');
 
-    if (!newAsset.hostname.trim() || !newAsset.ip.trim() || !newAsset.os.trim()) {
-      alert('Hostname, IP address, and operating system are required.')
-      return
-    }
+  // Dashboard metrics
+  const totalAssets = assets.length;
+  const highRiskAssets = assets.filter(a => ['Critical', 'High'].includes(a.risk)).length;
+  
+  const openFindings = findings.filter(f => f.status === 'Open').length;
+  const criticalFindings = findings.filter(f => f.severity === 'Critical').length;
+  const highFindings = findings.filter(f => f.severity === 'High').length;
 
-    const assetToAdd: Asset = {
-      id: Date.now(),
-      hostname: newAsset.hostname.trim(),
-      ip: newAsset.ip.trim(),
-      os: newAsset.os.trim(),
-      environment: newAsset.environment.trim() || 'Security Lab',
-      risk: newAsset.risk,
-      lastSeen: newAsset.lastSeen.trim() || 'Today',
-      ports: newAsset.ports
-        .split(',')
-        .map((port) => port.trim())
-        .filter(Boolean),
-    }
+  const unresolvedEvents = events.filter(e => ['Open', 'In Review'].includes(e.status)).length;
 
-    setAssetList((currentAssets) => [assetToAdd, ...currentAssets])
-    setSelectedAsset(assetToAdd)
-    setAssetFilter('All')
-    setNewFinding((currentFinding) => ({
-      ...currentFinding,
-      asset: assetToAdd.hostname,
-    }))
+  const assetMap = useMemo(() => {
+    const map: Record<string, Asset> = {};
+    assets.forEach(a => { map[a.id] = a; });
+    return map;
+  }, [assets]);
 
+  // Helpers
+  const getAssetName = (id: string) => assetMap[id]?.hostname || 'Unknown Asset';
+
+  const addAsset = () => {
+    if (!newAsset.hostname || !newAsset.ip) return;
+    
+    const asset: Asset = {
+      ...newAsset,
+      id: `a${Date.now()}`,
+    };
+    
+    setAssets([...assets, asset]);
     setNewAsset({
-      hostname: '',
-      ip: '',
-      os: '',
-      environment: 'Security Lab',
-      risk: 'Medium',
-      lastSeen: 'Today',
-      ports: '',
-    })
-  }
+      hostname: '', ip: '', os: '', environment: 'Lab', risk: 'Medium',
+      lastSeen: new Date().toISOString().split('T')[0], ports: '', notes: '',
+    });
+    setShowAddAsset(false);
+    setSelectedAsset(asset);
+  };
 
-  function handleAddFinding(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-
-    if (!newFinding.title.trim() || !newFinding.remediation.trim()) {
-      alert('Finding title and remediation recommendation are required.')
-      return
-    }
-
-    const findingToAdd: Finding = {
-      id: Date.now(),
-      title: newFinding.title.trim(),
-      asset: newFinding.asset,
-      severity: newFinding.severity,
-      status: newFinding.status,
-      description:
-        newFinding.description.trim() ||
-        'Manual finding documented from lab review.',
-      remediation: newFinding.remediation.trim(),
-      evidence:
-        newFinding.evidence.trim() ||
-        'Evidence pending. Add scan output or screenshot reference.',
-      recommendation:
-        newFinding.recommendation.trim() || newFinding.remediation.trim(),
-    }
-
-    setFindingList((currentFindings) => [findingToAdd, ...currentFindings])
-
+  const addFinding = () => {
+    if (!newFinding.title || !newFinding.affectedAssetId) return;
+    
+    const finding: Finding = {
+      ...newFinding,
+      id: `f${Date.now()}`,
+    };
+    
+    setFindings([...findings, finding]);
     setNewFinding({
-      title: '',
-      asset: selectedAsset.hostname,
-      severity: 'Medium',
-      status: 'Open',
-      description: '',
-      evidence: '',
-      remediation: '',
-      recommendation: '',
-    })
-  }
+      title: '', affectedAssetId: '', severity: 'Medium', status: 'Open',
+      description: '', evidence: '', recommendation: '', remediation: '',
+      owner: '', dueDate: '',
+    });
+    setShowAddFinding(false);
+  };
 
-  function handleAddEvent(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-
-    if (!newEvent.type.trim() || !newEvent.source.trim() || !newEvent.destination.trim()) {
-      alert('Event type, source, and destination are required.')
-      return
-    }
-
-    const eventToAdd: SecurityEvent = {
-      id: Date.now(),
-      type: newEvent.type.trim(),
-      source: newEvent.source.trim(),
-      destination: newEvent.destination.trim(),
-      severity: newEvent.severity,
-      status: newEvent.status,
-      time:
-        newEvent.time.trim() ||
-        new Date().toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
-      notes: newEvent.notes.trim() || 'Manual event entry.',
-    }
-
-    setEventList((currentEvents) => [eventToAdd, ...currentEvents])
-
+  const addEvent = () => {
+    if (!newEvent.eventType) return;
+    
+    const event: SecurityEvent = {
+      ...newEvent,
+      id: `e${Date.now()}`,
+    };
+    
+    setEvents([...events, event]);
     setNewEvent({
-      type: '',
-      source: '',
-      destination: '',
-      severity: 'Low',
-      status: 'Open',
-      time: '',
-      notes: '',
-    })
-  }
+      eventType: '', sourceIP: '', destIP: '', severity: 'Medium', status: 'Open',
+      timestamp: new Date().toISOString().slice(0, 16), notes: '', relatedAssetId: '',
+    });
+    setShowAddEvent(false);
+  };
 
-  function updateFindingStatus(id: number, status: FindingStatus) {
-    setFindingList((currentFindings) =>
-      currentFindings.map((finding) =>
-        finding.id === id ? { ...finding, status } : finding
-      )
-    )
-  }
+  const updateFindingStatus = (id: string, newStatus: FindingStatus) => {
+    setFindings(findings.map(f => f.id === id ? { ...f, status: newStatus } : f));
+  };
 
-  function updateEventStatus(id: number, status: EventStatus) {
-    setEventList((currentEvents) =>
-      currentEvents.map((event) =>
-        event.id === id ? { ...event, status } : event
-      )
-    )
-  }
+  const updateEventStatus = (id: string, newStatus: EventStatus) => {
+    setEvents(events.map(e => e.id === id ? { ...e, status: newStatus } : e));
+  };
 
-  const filteredAssets = useMemo(() => {
-    if (assetFilter === 'All') return assetList
-    return assetList.filter((asset) => asset.risk === assetFilter)
-  }, [assetFilter, assetList])
+  const importCSV = () => {
+    if (!csvInput.trim()) return;
+    
+    const lines = csvInput.trim().split('\n');
+    const newAssets: Asset[] = [];
+    
+    lines.forEach((line, index) => {
+      if (index === 0 && line.toLowerCase().includes('hostname')) return; // skip header
+      
+      const parts = line.split(',').map(p => p.trim().replace(/^"|"$/g, ''));
+      if (parts.length < 4) return;
+      
+      const [hostname, ip, os, riskStr, ports = ''] = parts;
+      
+      if (!hostname || !ip) return;
+      
+      const risk = (['Critical','High','Medium','Low'].includes(riskStr) ? riskStr : 'Medium') as RiskLevel;
+      
+      newAssets.push({
+        id: `a${Date.now()}-${index}`,
+        hostname,
+        ip,
+        os: os || 'Unknown',
+        environment: 'Lab',
+        risk,
+        lastSeen: new Date().toISOString().split('T')[0],
+        ports,
+        notes: 'Imported via CSV',
+      });
+    });
+    
+    if (newAssets.length > 0) {
+      setAssets([...assets, ...newAssets]);
+      setCsvInput('');
+      setShowImportCSV(false);
+    }
+  };
 
-  const criticalFindings = findingList.filter(
-    (finding) => finding.severity === 'Critical'
-  ).length
-
-  const openFindings = findingList.filter(
-    (finding) =>
-      finding.status !== 'Resolved' &&
-      finding.status !== 'Risk Accepted' &&
-      finding.status !== 'False Positive'
-  ).length
-
-  const highRiskAssets = assetList.filter((asset) =>
-    ['Critical', 'High'].includes(asset.risk)
-  ).length
-
-  const unresolvedFindings = findingList.filter(
-    (finding) =>
-      finding.status !== 'Resolved' &&
-      finding.status !== 'Risk Accepted' &&
-      finding.status !== 'False Positive'
-  )
-
-  const reportDate = new Date().toLocaleDateString()
+  const printReport = () => {
+    window.print();
+  };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100">
-      <section className="border-b border-white/10 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 px-6 py-10 print:bg-white print:text-black">
-        <div className="mx-auto max-w-7xl">
-          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-mono">
+      {/* Header */}
+      <header className="border-b border-white/10 bg-slate-900 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-9 h-9 bg-teal-500 rounded flex items-center justify-center text-slate-950 font-bold">SS</div>
             <div>
-              <p className="mb-3 text-sm font-semibold uppercase tracking-[0.25em] text-teal-400 print:text-slate-700">
-                SyferSec Lab Console
-              </p>
-
-              <h1 className="text-4xl font-extrabold tracking-tight md:text-5xl">
-                Security lab visibility for assets, findings, events, and
-                evidence.
-              </h1>
-
-              <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-400 print:text-slate-700">
-                A cybersecurity portfolio dashboard for documenting lab systems,
-                open ports, vulnerability notes, remediation status, and
-                security event activity.
-              </p>
+              <h1 className="text-2xl font-semibold tracking-tight">SyferSec Lab Console</h1>
+              <p className="text-xs text-slate-500 -mt-1">Local-state MVP • Data resets on refresh</p>
             </div>
-
-            <button
-              onClick={() => window.print()}
-              className="rounded-2xl border border-teal-400/20 bg-teal-400/10 px-5 py-4 text-left text-sm text-teal-200 transition hover:bg-teal-400/20 print:hidden"
+          </div>
+          
+          <div className="flex items-center gap-6 text-sm">
+            <button 
+              onClick={() => setActiveTab('dashboard')}
+              className={`hover:text-teal-400 transition-colors ${activeTab === 'dashboard' ? 'text-teal-400' : 'text-slate-400'}`}
             >
-              Print / Save PDF Report
+              Dashboard
+            </button>
+            <button 
+              onClick={() => setActiveTab('assets')}
+              className={`hover:text-teal-400 transition-colors ${activeTab === 'assets' ? 'text-teal-400' : 'text-slate-400'}`}
+            >
+              Assets
+            </button>
+            <button 
+              onClick={() => setActiveTab('findings')}
+              className={`hover:text-teal-400 transition-colors ${activeTab === 'findings' ? 'text-teal-400' : 'text-slate-400'}`}
+            >
+              Findings
+            </button>
+            <button 
+              onClick={() => setActiveTab('events')}
+              className={`hover:text-teal-400 transition-colors ${activeTab === 'events' ? 'text-teal-400' : 'text-slate-400'}`}
+            >
+              Events
+            </button>
+            <button 
+              onClick={() => setActiveTab('report')}
+              className={`hover:text-teal-400 transition-colors ${activeTab === 'report' ? 'text-teal-400' : 'text-slate-400'}`}
+            >
+              Report
+            </button>
+            <button 
+              onClick={() => setActiveTab('planning')}
+              className={`hover:text-teal-400 transition-colors ${activeTab === 'planning' ? 'text-teal-400' : 'text-slate-400'}`}
+            >
+              Scan Planning
             </button>
           </div>
         </div>
-      </section>
+      </header>
 
-      <section className="mx-auto grid max-w-7xl gap-6 px-6 py-8 md:grid-cols-4">
-        <div className="rounded-2xl border border-white/10 bg-slate-900 p-5 print:border-slate-300 print:bg-white">
-          <p className="text-sm text-slate-400 print:text-slate-600">Total Assets</p>
-          <h2 className="mt-2 text-3xl font-bold">{assetList.length}</h2>
-        </div>
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* DASHBOARD */}
+        {activeTab === 'dashboard' && (
+          <div className="space-y-8">
+            <div>
+              <h2 className="text-3xl font-semibold mb-2">Lab Overview</h2>
+              <p className="text-slate-400">Real-time security posture • Local MVP</p>
+            </div>
 
-        <div className="rounded-2xl border border-white/10 bg-slate-900 p-5 print:border-slate-300 print:bg-white">
-          <p className="text-sm text-slate-400 print:text-slate-600">High Risk Assets</p>
-          <h2 className="mt-2 text-3xl font-bold text-orange-300 print:text-black">
-            {highRiskAssets}
-          </h2>
-        </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="bg-slate-900 border border-white/10 rounded-xl p-6">
+                <div className="text-slate-400 text-sm">Total Assets</div>
+                <div className="text-5xl font-semibold mt-2">{totalAssets}</div>
+              </div>
+              <div className="bg-slate-900 border border-white/10 rounded-xl p-6">
+                <div className="text-slate-400 text-sm">High Risk Assets</div>
+                <div className="text-5xl font-semibold mt-2 text-orange-400">{highRiskAssets}</div>
+              </div>
+              <div className="bg-slate-900 border border-white/10 rounded-xl p-6">
+                <div className="text-slate-400 text-sm">Open Findings</div>
+                <div className="text-5xl font-semibold mt-2 text-red-400">{openFindings}</div>
+              </div>
+              <div className="bg-slate-900 border border-white/10 rounded-xl p-6">
+                <div className="text-slate-400 text-sm">Unresolved Events</div>
+                <div className="text-5xl font-semibold mt-2 text-yellow-400">{unresolvedEvents}</div>
+              </div>
+            </div>
 
-        <div className="rounded-2xl border border-white/10 bg-slate-900 p-5 print:border-slate-300 print:bg-white">
-          <p className="text-sm text-slate-400 print:text-slate-600">Open Findings</p>
-          <h2 className="mt-2 text-3xl font-bold text-yellow-300 print:text-black">
-            {openFindings}
-          </h2>
-        </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Recent Assets */}
+              <div className="bg-slate-900 border border-white/10 rounded-xl p-6">
+                <h3 className="font-medium mb-4 flex items-center justify-between">
+                  Recent Assets
+                  <button onClick={() => setActiveTab('assets')} className="text-teal-400 text-sm hover:underline">Manage →</button>
+                </h3>
+                <div className="space-y-3">
+                  {assets.slice(0, 4).map(asset => (
+                    <div 
+                      key={asset.id}
+                      onClick={() => { setSelectedAsset(asset); setActiveTab('assets'); }}
+                      className="flex justify-between items-center p-3 bg-slate-950 hover:bg-slate-800 border border-white/5 rounded-lg cursor-pointer transition"
+                    >
+                      <div>
+                        <div className="font-medium">{asset.hostname}</div>
+                        <div className="text-xs text-slate-500">{asset.ip} • {asset.os}</div>
+                      </div>
+                      <div className={`px-3 py-1 text-xs rounded-full border ${severityColors[asset.risk]}`}>
+                        {asset.risk}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-        <div className="rounded-2xl border border-white/10 bg-slate-900 p-5 print:border-slate-300 print:bg-white">
-          <p className="text-sm text-slate-400 print:text-slate-600">Critical Findings</p>
-          <h2 className="mt-2 text-3xl font-bold text-red-300 print:text-black">
-            {criticalFindings}
-          </h2>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-6 pb-8 print:hidden">
-        <form
-          onSubmit={handleAddAsset}
-          className="rounded-2xl border border-white/10 bg-slate-900 p-6"
-        >
-          <div className="mb-5">
-            <h2 className="text-2xl font-bold">Add New Asset</h2>
-            <p className="text-sm text-slate-400">
-              Add a lab host, IP address, operating system, risk level, and known
-              ports.
-            </p>
+              {/* Recent Findings */}
+              <div className="bg-slate-900 border border-white/10 rounded-xl p-6">
+                <h3 className="font-medium mb-4 flex items-center justify-between">
+                  Recent Findings
+                  <button onClick={() => setActiveTab('findings')} className="text-teal-400 text-sm hover:underline">Manage →</button>
+                </h3>
+                <div className="space-y-3">
+                  {findings.slice(0, 4).map(finding => (
+                    <div key={finding.id} className="p-3 bg-slate-950 border border-white/5 rounded-lg">
+                      <div className="flex justify-between">
+                        <div className="font-medium text-sm">{finding.title}</div>
+                        <div className={`text-xs px-2 py-0.5 rounded ${severityColors[finding.severity]}`}>
+                          {finding.severity}
+                        </div>
+                      </div>
+                      <div className="text-xs text-slate-400 mt-1">{getAssetName(finding.affectedAssetId)}</div>
+                      <div className={`inline-block mt-2 text-xs px-3 py-1 rounded-full ${statusColors[finding.status]}`}>
+                        {finding.status}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
+        )}
 
-          <div className="grid gap-4 md:grid-cols-3">
-            <label className="grid gap-2">
-              <span className="text-sm font-semibold text-slate-300">Hostname</span>
-              <input
-                value={newAsset.hostname}
-                onChange={(event) =>
-                  setNewAsset((currentAsset) => ({
-                    ...currentAsset,
-                    hostname: event.target.value,
-                  }))
-                }
-                className="rounded-lg border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-teal-400"
-                placeholder="ubuntu-lab-host"
-              />
-            </label>
+        {/* ASSETS TAB */}
+        {activeTab === 'assets' && (
+          <div>
+            <div className="flex justify-between items-center mb-8">
+              <div>
+                <h2 className="text-3xl font-semibold">Asset Inventory</h2>
+                <p className="text-slate-400">Tracked systems and risk posture</p>
+              </div>
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => setShowImportCSV(true)}
+                  className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 border border-white/10 rounded-lg text-sm flex items-center gap-2"
+                >
+                  Import Scan CSV
+                </button>
+                <button 
+                  onClick={() => setShowAddAsset(true)}
+                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-500 rounded-lg text-sm font-medium flex items-center gap-2"
+                >
+                  + Add Asset
+                </button>
+              </div>
+            </div>
 
-            <label className="grid gap-2">
-              <span className="text-sm font-semibold text-slate-300">IP Address</span>
-              <input
-                value={newAsset.ip}
-                onChange={(event) =>
-                  setNewAsset((currentAsset) => ({
-                    ...currentAsset,
-                    ip: event.target.value,
-                  }))
-                }
-                className="rounded-lg border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-teal-400"
-                placeholder="192.168.50.10"
-              />
-            </label>
+            {/* Asset List */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <div className="bg-slate-900 border border-white/10 rounded-2xl overflow-hidden">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-white/10 text-xs text-slate-400">
+                        <th className="py-4 px-6 text-left">Hostname</th>
+                        <th className="py-4 px-6 text-left">IP</th>
+                        <th className="py-4 px-6 text-left">OS</th>
+                        <th className="py-4 px-6 text-left">Risk</th>
+                        <th className="py-4 px-6 text-left">Last Seen</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/10">
+                      {assets.map(asset => (
+                        <tr 
+                          key={asset.id}
+                          onClick={() => setSelectedAsset(asset)}
+                          className={`hover:bg-slate-800/70 cursor-pointer transition ${selectedAsset?.id === asset.id ? 'bg-slate-800' : ''}`}
+                        >
+                          <td className="py-4 px-6 font-medium">{asset.hostname}</td>
+                          <td className="py-4 px-6 text-slate-400 font-mono text-sm">{asset.ip}</td>
+                          <td className="py-4 px-6 text-slate-400">{asset.os}</td>
+                          <td className="py-4 px-6">
+                            <span className={`px-4 py-1 text-xs rounded-full border ${severityColors[asset.risk]}`}>
+                              {asset.risk}
+                            </span>
+                          </td>
+                          <td className="py-4 px-6 text-slate-400 text-sm">{asset.lastSeen}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
 
-            <label className="grid gap-2">
-              <span className="text-sm font-semibold text-slate-300">Operating System</span>
-              <input
-                value={newAsset.os}
-                onChange={(event) =>
-                  setNewAsset((currentAsset) => ({
-                    ...currentAsset,
-                    os: event.target.value,
-                  }))
-                }
-                className="rounded-lg border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-teal-400"
-                placeholder="Ubuntu Linux"
-              />
-            </label>
+              {/* Selected Asset Detail */}
+              <div className="bg-slate-900 border border-white/10 rounded-2xl p-6">
+                {selectedAsset ? (
+                  <>
+                    <h3 className="text-xl font-semibold mb-6">{selectedAsset.hostname}</h3>
+                    <div className="space-y-6 text-sm">
+                      <div>
+                        <div className="text-slate-400 mb-1">IP Address</div>
+                        <div className="font-mono">{selectedAsset.ip}</div>
+                      </div>
+                      <div>
+                        <div className="text-slate-400 mb-1">Operating System</div>
+                        <div>{selectedAsset.os}</div>
+                      </div>
+                      <div>
+                        <div className="text-slate-400 mb-1">Environment</div>
+                        <div>{selectedAsset.environment}</div>
+                      </div>
+                      <div>
+                        <div className="text-slate-400 mb-1">Risk Level</div>
+                        <div className={`inline-block px-5 py-1 rounded-full border ${severityColors[selectedAsset.risk]}`}>
+                          {selectedAsset.risk}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-slate-400 mb-1">Open Ports / Services</div>
+                        <div className="font-mono text-xs bg-slate-950 p-3 rounded border border-white/10">{selectedAsset.ports}</div>
+                      </div>
+                      <div>
+                        <div className="text-slate-400 mb-1">Notes</div>
+                        <div className="text-slate-300">{selectedAsset.notes || 'No notes.'}</div>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="h-full flex items-center justify-center text-slate-500 text-center">
+                    Select an asset from the table
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
-            <label className="grid gap-2">
-              <span className="text-sm font-semibold text-slate-300">Environment</span>
-              <input
-                value={newAsset.environment}
-                onChange={(event) =>
-                  setNewAsset((currentAsset) => ({
-                    ...currentAsset,
-                    environment: event.target.value,
-                  }))
-                }
-                className="rounded-lg border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-teal-400"
-                placeholder="Security Lab"
-              />
-            </label>
-
-            <label className="grid gap-2">
-              <span className="text-sm font-semibold text-slate-300">Risk Level</span>
-              <select
-                value={newAsset.risk}
-                onChange={(event) =>
-                  setNewAsset((currentAsset) => ({
-                    ...currentAsset,
-                    risk: event.target.value as RiskLevel,
-                  }))
-                }
-                className="rounded-lg border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-teal-400"
+        {/* FINDINGS TAB */}
+        {activeTab === 'findings' && (
+          <div>
+            <div className="flex justify-between items-center mb-8">
+              <div>
+                <h2 className="text-3xl font-semibold">Findings Tracker</h2>
+                <p className="text-slate-400">Vulnerabilities and issues</p>
+              </div>
+              <button 
+                onClick={() => setShowAddFinding(true)}
+                className="px-5 py-2.5 bg-teal-600 hover:bg-teal-500 rounded-lg text-sm font-medium flex items-center gap-2"
               >
-                <option>Critical</option>
-                <option>High</option>
-                <option>Medium</option>
-                <option>Low</option>
-              </select>
-            </label>
+                + Add Finding
+              </button>
+            </div>
 
-            <label className="grid gap-2">
-              <span className="text-sm font-semibold text-slate-300">Last Seen</span>
-              <input
-                value={newAsset.lastSeen}
-                onChange={(event) =>
-                  setNewAsset((currentAsset) => ({
-                    ...currentAsset,
-                    lastSeen: event.target.value,
-                  }))
-                }
-                className="rounded-lg border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-teal-400"
-                placeholder="Today"
-              />
-            </label>
+            <div className="space-y-4">
+              {findings.map(finding => {
+                const asset = assetMap[finding.affectedAssetId];
+                return (
+                  <div key={finding.id} className="bg-slate-900 border border-white/10 rounded-2xl p-6">
+                    <div className="flex flex-wrap gap-4 justify-between items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3">
+                          <span className={`px-4 py-1 text-xs rounded-full border ${severityColors[finding.severity]}`}>
+                            {finding.severity}
+                          </span>
+                          <span className={`px-4 py-1 text-xs rounded-full ${statusColors[finding.status]}`}>
+                            {finding.status}
+                          </span>
+                        </div>
+                        <h3 className="text-xl font-semibold mt-4">{finding.title}</h3>
+                        <div className="text-teal-400 mt-1 text-sm">↳ {asset?.hostname}</div>
+                      </div>
+                      
+                      <div className="flex flex-col items-end gap-2">
+                        <select 
+                          value={finding.status}
+                          onChange={(e) => updateFindingStatus(finding.id, e.target.value as FindingStatus)}
+                          className="bg-slate-800 border border-white/10 text-xs px-4 py-2 rounded-lg focus:outline-none focus:border-teal-500"
+                        >
+                          <option value="Open">Open</option>
+                          <option value="In Review">In Review</option>
+                          <option value="Planned">Planned</option>
+                          <option value="Resolved">Resolved</option>
+                          <option value="Risk Accepted">Risk Accepted</option>
+                          <option value="False Positive">False Positive</option>
+                        </select>
+                      </div>
+                    </div>
 
-            <label className="grid gap-2 md:col-span-2">
-              <span className="text-sm font-semibold text-slate-300">
-                Open Ports / Services
-              </span>
-              <input
-                value={newAsset.ports}
-                onChange={(event) =>
-                  setNewAsset((currentAsset) => ({
-                    ...currentAsset,
-                    ports: event.target.value,
-                  }))
-                }
-                className="rounded-lg border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-teal-400"
-                placeholder="22/tcp SSH, 80/tcp HTTP, 443/tcp HTTPS"
-              />
-            </label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 text-sm">
+                      <div>
+                        <div className="uppercase text-xs tracking-widest text-slate-500 mb-2">DESCRIPTION</div>
+                        <p className="text-slate-300 leading-relaxed">{finding.description}</p>
+                      </div>
+                      <div>
+                        <div className="uppercase text-xs tracking-widest text-slate-500 mb-2">EVIDENCE</div>
+                        <p className="text-slate-400 font-light italic">{finding.evidence}</p>
+                      </div>
+                    </div>
 
-            <div className="flex items-end">
-              <button
-                type="submit"
-                className="w-full rounded-lg bg-teal-500 px-4 py-3 font-semibold text-slate-950 transition hover:bg-teal-400"
+                    <div className="mt-8 pt-6 border-t border-white/10 grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div>
+                        <div className="uppercase text-xs tracking-widest text-slate-500 mb-2">RECOMMENDATION</div>
+                        <p>{finding.recommendation}</p>
+                      </div>
+                      <div>
+                        <div className="uppercase text-xs tracking-widest text-slate-500 mb-2">REMEDIATION ACTION</div>
+                        <p className="font-mono text-xs bg-slate-950 p-4 rounded">{finding.remediation}</p>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 text-xs text-slate-500 flex gap-6">
+                      {finding.owner && <div>Owner: {finding.owner}</div>}
+                      {finding.dueDate && <div>Due: {finding.dueDate}</div>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* EVENTS TAB */}
+        {activeTab === 'events' && (
+          <div>
+            <div className="flex justify-between items-center mb-8">
+              <div>
+                <h2 className="text-3xl font-semibold">Security Events</h2>
+                <p className="text-slate-400">Detected activity log</p>
+              </div>
+              <button 
+                onClick={() => setShowAddEvent(true)}
+                className="px-5 py-2.5 bg-teal-600 hover:bg-teal-500 rounded-lg text-sm font-medium flex items-center gap-2"
+              >
+                + Log Event
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {events.map(event => (
+                <div key={event.id} className="bg-slate-900 border border-white/10 rounded-2xl p-6">
+                  <div className="flex justify-between">
+                    <div>
+                      <div className="flex items-center gap-3">
+                        <span className={`px-4 py-1 text-xs rounded-full border ${severityColors[event.severity]}`}>{event.severity}</span>
+                        <span className={`px-4 py-1 text-xs rounded-full ${statusColors[event.status]}`}>{event.status}</span>
+                      </div>
+                      <h3 className="text-lg font-medium mt-4">{event.eventType}</h3>
+                    </div>
+                    <div className="text-right text-xs text-slate-400">
+                      {new Date(event.timestamp).toLocaleString()}
+                    </div>
+                  </div>
+
+                  <div className="mt-6 grid grid-cols-2 gap-8 text-sm">
+                    <div>
+                      <div className="text-slate-400">Source IP</div>
+                      <div className="font-mono">{event.sourceIP}</div>
+                    </div>
+                    <div>
+                      <div className="text-slate-400">Destination IP</div>
+                      <div className="font-mono">{event.destIP}</div>
+                    </div>
+                  </div>
+
+                  <div className="mt-6">
+                    <div className="text-slate-400 text-xs mb-1">NOTES</div>
+                    <p className="text-slate-300">{event.notes}</p>
+                  </div>
+
+                  <div className="mt-8 flex justify-between items-center">
+                    <select 
+                      value={event.status}
+                      onChange={(e) => updateEventStatus(event.id, e.target.value as EventStatus)}
+                      className="bg-slate-800 border border-white/10 text-xs px-5 py-2 rounded-lg"
+                    >
+                      <option value="Open">Open</option>
+                      <option value="In Review">In Review</option>
+                      <option value="Reviewed">Reviewed</option>
+                      <option value="Resolved">Resolved</option>
+                    </select>
+                    {event.relatedAssetId && (
+                      <div className="text-xs text-teal-400">Related: {getAssetName(event.relatedAssetId)}</div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* REPORT TAB */}
+        {activeTab === 'report' && (
+          <div className="print:bg-white print:text-slate-950">
+            <div className="flex justify-between items-start mb-10 print:hidden">
+              <div>
+                <h2 className="text-3xl font-semibold">Executive Report</h2>
+                <p className="text-slate-400">Generated {new Date().toLocaleDateString()}</p>
+              </div>
+              <button 
+                onClick={printReport}
+                className="px-8 py-3 bg-teal-600 hover:bg-teal-500 rounded-xl text-sm font-medium flex items-center gap-3"
+              >
+                🖨️ Print / Save PDF
+              </button>
+            </div>
+
+            {/* Printable Content */}
+            <div className="bg-slate-900 border border-white/10 rounded-3xl p-12 print:bg-white print:border-none print:shadow-none max-w-4xl mx-auto">
+              <div className="text-center mb-12 print:mb-8">
+                <div className="text-teal-500 text-4xl font-bold tracking-[4px] print:text-teal-700">SYFERSEC</div>
+                <div className="text-2xl mt-3">Security Lab Assessment Report</div>
+                <div className="text-sm text-slate-400 mt-1">As of {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
+              </div>
+
+              <div className="prose prose-invert print:prose-slate max-w-none">
+                <h3 className="text-xl border-b border-white/10 pb-3 print:border-slate-300">Executive Summary</h3>
+                <p className="text-slate-300 print:text-slate-700">
+                  This local lab console documents {totalAssets} assets with {openFindings} open findings. 
+                  Risk posture is being actively managed in a controlled environment.
+                </p>
+
+                <h3 className="text-xl border-b border-white/10 pb-3 mt-12 print:mt-10">Asset Summary</h3>
+                <p>{totalAssets} systems tracked • {highRiskAssets} high/critical risk</p>
+
+                <h3 className="text-xl border-b border-white/10 pb-3 mt-12 print:mt-10">Priority Findings</h3>
+                <div className="space-y-6 mt-6">
+                  {findings.filter(f => ['Critical','High'].includes(f.severity)).map(f => (
+                    <div key={f.id} className="border-l-4 border-red-500 pl-6">
+                      <div className="font-medium">{f.title}</div>
+                      <div className="text-sm text-slate-400">{getAssetName(f.affectedAssetId)} • {f.status}</div>
+                      <div className="mt-2 text-sm">{f.recommendation}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <h3 className="text-xl border-b border-white/10 pb-3 mt-12 print:mt-10">Key Recommendations</h3>
+                <ul className="list-disc pl-6 space-y-2 mt-4 text-slate-300 print:text-slate-700">
+                  {findings.map(f => (
+                    <li key={f.id}>{f.recommendation}</li>
+                  ))}
+                </ul>
+
+                <div className="mt-16 text-xs text-center text-slate-500 print:text-slate-400">
+                  Local-state MVP demonstration portfolio. Prepared for professional review.
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* SCAN PLANNING */}
+        {activeTab === 'planning' && (
+          <div>
+            <h2 className="text-3xl font-semibold mb-2">Controlled Scan Planning</h2>
+            <p className="text-slate-400 mb-10">Safe, permission-based scan profiles (planning UI only)</p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[
+                { name: "Discovery", color: "teal", desc: "Host discovery, port scan (top 1000), service version detection. Low impact." },
+                { name: "Standard", color: "cyan", desc: "Full port scan, vulnerability scripts, OS detection. Moderate intensity." },
+                { name: "Deep Lab", color: "amber", desc: "Aggressive enumeration, credentialed checks, web app scanning. Lab environment only." },
+                { name: "Custom", color: "purple", desc: "User-defined parameters. For advanced users with explicit authorization." },
+              ].map(profile => (
+                <div key={profile.name} className="bg-slate-900 border border-white/10 rounded-2xl p-8 hover:border-teal-500/30 transition">
+                  <div className={`inline px-5 py-1 text-xs rounded-full bg-${profile.color}-500/10 text-${profile.color}-400 border border-${profile.color}-500/30`}>
+                    {profile.name}
+                  </div>
+                  <p className="mt-8 leading-relaxed text-slate-300">{profile.desc}</p>
+                  <div className="mt-10 text-xs text-slate-500">• No live execution • Future Nmap integration placeholder</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-12 text-sm bg-slate-900/70 border border-white/10 p-6 rounded-2xl">
+              <strong>Legal Note:</strong> Run scans only against systems you own or have explicit written permission to test. 
+              Unauthorized scanning is illegal.
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ADD ASSET MODAL */}
+      {showAddAsset && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-6">
+          <div className="bg-slate-900 border border-white/10 rounded-3xl w-full max-w-lg">
+            <div className="p-8">
+              <h3 className="text-2xl font-semibold mb-8">Add New Asset</h3>
+              
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-xs text-slate-400 mb-2">HOSTNAME</label>
+                  <input 
+                    type="text" 
+                    value={newAsset.hostname}
+                    onChange={e => setNewAsset({...newAsset, hostname: e.target.value})}
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-5 py-3 focus:outline-none focus:border-teal-500"
+                    placeholder="web-server-01"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs text-slate-400 mb-2">IP ADDRESS</label>
+                    <input 
+                      type="text" 
+                      value={newAsset.ip}
+                      onChange={e => setNewAsset({...newAsset, ip: e.target.value})}
+                      className="w-full bg-slate-950 border border-white/10 rounded-xl px-5 py-3 focus:outline-none focus:border-teal-500 font-mono"
+                      placeholder="192.168.1.100"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-slate-400 mb-2">RISK LEVEL</label>
+                    <select 
+                      value={newAsset.risk}
+                      onChange={e => setNewAsset({...newAsset, risk: e.target.value as RiskLevel})}
+                      className="w-full bg-slate-950 border border-white/10 rounded-xl px-5 py-3 focus:outline-none focus:border-teal-500"
+                    >
+                      <option value="Critical">Critical</option>
+                      <option value="High">High</option>
+                      <option value="Medium">Medium</option>
+                      <option value="Low">Low</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs text-slate-400 mb-2">OPERATING SYSTEM</label>
+                  <input 
+                    type="text" 
+                    value={newAsset.os}
+                    onChange={e => setNewAsset({...newAsset, os: e.target.value})}
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-5 py-3 focus:outline-none focus:border-teal-500"
+                    placeholder="Ubuntu 22.04 LTS"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-slate-400 mb-2">OPEN PORTS / SERVICES</label>
+                  <textarea 
+                    value={newAsset.ports}
+                    onChange={e => setNewAsset({...newAsset, ports: e.target.value})}
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-5 py-3 h-24 focus:outline-none focus:border-teal-500 resize-y"
+                    placeholder="22/tcp SSH&#10;80/tcp HTTP"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-slate-400 mb-2">NOTES</label>
+                  <textarea 
+                    value={newAsset.notes}
+                    onChange={e => setNewAsset({...newAsset, notes: e.target.value})}
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-5 py-3 h-20 focus:outline-none focus:border-teal-500"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="border-t border-white/10 p-4 flex gap-3">
+              <button 
+                onClick={() => setShowAddAsset(false)}
+                className="flex-1 py-4 text-slate-400 hover:bg-slate-800 rounded-2xl"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={addAsset}
+                className="flex-1 py-4 bg-teal-600 hover:bg-teal-500 rounded-2xl font-medium"
               >
                 Add Asset
               </button>
             </div>
           </div>
-        </form>
-      </section>
+        </div>
+      )}
 
-      <section className="mx-auto max-w-7xl px-6 pb-8 print:hidden">
-        <form
-          onSubmit={handleAddFinding}
-          className="rounded-2xl border border-white/10 bg-slate-900 p-6"
-        >
-          <div className="mb-5">
-            <h2 className="text-2xl font-bold">Add New Finding</h2>
-            <p className="text-sm text-slate-400">
-              Document vulnerability notes, evidence, recommendation, and
-              remediation status.
-            </p>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-3">
-            <label className="grid gap-2 md:col-span-2">
-              <span className="text-sm font-semibold text-slate-300">Finding Title</span>
-              <input
-                value={newFinding.title}
-                onChange={(event) =>
-                  setNewFinding((currentFinding) => ({
-                    ...currentFinding,
-                    title: event.target.value,
-                  }))
-                }
-                className="rounded-lg border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-teal-400"
-                placeholder="Unpatched service detected"
-              />
-            </label>
-
-            <label className="grid gap-2">
-              <span className="text-sm font-semibold text-slate-300">Affected Asset</span>
-              <select
-                value={newFinding.asset}
-                onChange={(event) =>
-                  setNewFinding((currentFinding) => ({
-                    ...currentFinding,
-                    asset: event.target.value,
-                  }))
-                }
-                className="rounded-lg border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-teal-400"
-              >
-                {assetList.map((asset) => (
-                  <option key={asset.id}>{asset.hostname}</option>
-                ))}
-              </select>
-            </label>
-
-            <label className="grid gap-2">
-              <span className="text-sm font-semibold text-slate-300">Severity</span>
-              <select
-                value={newFinding.severity}
-                onChange={(event) =>
-                  setNewFinding((currentFinding) => ({
-                    ...currentFinding,
-                    severity: event.target.value as RiskLevel,
-                  }))
-                }
-                className="rounded-lg border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-teal-400"
-              >
-                <option>Critical</option>
-                <option>High</option>
-                <option>Medium</option>
-                <option>Low</option>
-              </select>
-            </label>
-
-            <label className="grid gap-2">
-              <span className="text-sm font-semibold text-slate-300">Status</span>
-              <select
-                value={newFinding.status}
-                onChange={(event) =>
-                  setNewFinding((currentFinding) => ({
-                    ...currentFinding,
-                    status: event.target.value as FindingStatus,
-                  }))
-                }
-                className="rounded-lg border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-teal-400"
-              >
-                <option>Open</option>
-                <option>In Review</option>
-                <option>Planned</option>
-                <option>Resolved</option>
-                <option>Risk Accepted</option>
-                <option>False Positive</option>
-              </select>
-            </label>
-
-            <label className="grid gap-2 md:col-span-3">
-              <span className="text-sm font-semibold text-slate-300">Finding Description</span>
-              <textarea
-                value={newFinding.description}
-                onChange={(event) =>
-                  setNewFinding((currentFinding) => ({
-                    ...currentFinding,
-                    description: event.target.value,
-                  }))
-                }
-                rows={2}
-                className="rounded-lg border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-teal-400"
-                placeholder="Describe the security concern."
-              />
-            </label>
-
-            <label className="grid gap-2 md:col-span-3">
-              <span className="text-sm font-semibold text-slate-300">Evidence Notes</span>
-              <textarea
-                value={newFinding.evidence}
-                onChange={(event) =>
-                  setNewFinding((currentFinding) => ({
-                    ...currentFinding,
-                    evidence: event.target.value,
-                  }))
-                }
-                rows={2}
-                className="rounded-lg border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-teal-400"
-                placeholder="Example: Nmap showed port 445/tcp open."
-              />
-            </label>
-
-            <label className="grid gap-2 md:col-span-3">
-              <span className="text-sm font-semibold text-slate-300">Recommendation</span>
-              <textarea
-                value={newFinding.recommendation}
-                onChange={(event) =>
-                  setNewFinding((currentFinding) => ({
-                    ...currentFinding,
-                    recommendation: event.target.value,
-                  }))
-                }
-                rows={2}
-                className="rounded-lg border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-teal-400"
-                placeholder="Write the client-friendly recommendation."
-              />
-            </label>
-
-            <label className="grid gap-2 md:col-span-3">
-              <span className="text-sm font-semibold text-slate-300">
-                Remediation Action
-              </span>
-              <textarea
-                value={newFinding.remediation}
-                onChange={(event) =>
-                  setNewFinding((currentFinding) => ({
-                    ...currentFinding,
-                    remediation: event.target.value,
-                  }))
-                }
-                rows={3}
-                className="rounded-lg border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-teal-400"
-                placeholder="Describe the corrective action."
-              />
-            </label>
-
-            <div className="flex items-end md:col-span-3">
-              <button
-                type="submit"
-                className="w-full rounded-lg bg-teal-500 px-4 py-3 font-semibold text-slate-950 transition hover:bg-teal-400 md:w-auto md:px-8"
-              >
-                Add Finding
-              </button>
-            </div>
-          </div>
-        </form>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-6 pb-8 print:hidden">
-        <form
-          onSubmit={handleAddEvent}
-          className="rounded-2xl border border-white/10 bg-slate-900 p-6"
-        >
-          <div className="mb-5">
-            <h2 className="text-2xl font-bold">Add Security Event</h2>
-            <p className="text-sm text-slate-400">
-              Record authorized lab activity, alerts, authentication attempts,
-              or scan events.
-            </p>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-3">
-            <label className="grid gap-2">
-              <span className="text-sm font-semibold text-slate-300">Event Type</span>
-              <input
-                value={newEvent.type}
-                onChange={(event) =>
-                  setNewEvent((currentEvent) => ({
-                    ...currentEvent,
-                    type: event.target.value,
-                  }))
-                }
-                className="rounded-lg border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-teal-400"
-                placeholder="Port Scan"
-              />
-            </label>
-
-            <label className="grid gap-2">
-              <span className="text-sm font-semibold text-slate-300">Source IP</span>
-              <input
-                value={newEvent.source}
-                onChange={(event) =>
-                  setNewEvent((currentEvent) => ({
-                    ...currentEvent,
-                    source: event.target.value,
-                  }))
-                }
-                className="rounded-lg border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-teal-400"
-                placeholder="192.168.50.105"
-              />
-            </label>
-
-            <label className="grid gap-2">
-              <span className="text-sm font-semibold text-slate-300">Destination IP</span>
-              <input
-                value={newEvent.destination}
-                onChange={(event) =>
-                  setNewEvent((currentEvent) => ({
-                    ...currentEvent,
-                    destination: event.target.value,
-                  }))
-                }
-                className="rounded-lg border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-teal-400"
-                placeholder="192.168.50.100"
-              />
-            </label>
-
-            <label className="grid gap-2">
-              <span className="text-sm font-semibold text-slate-300">Severity</span>
-              <select
-                value={newEvent.severity}
-                onChange={(event) =>
-                  setNewEvent((currentEvent) => ({
-                    ...currentEvent,
-                    severity: event.target.value as RiskLevel,
-                  }))
-                }
-                className="rounded-lg border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-teal-400"
-              >
-                <option>Critical</option>
-                <option>High</option>
-                <option>Medium</option>
-                <option>Low</option>
-              </select>
-            </label>
-
-            <label className="grid gap-2">
-              <span className="text-sm font-semibold text-slate-300">Status</span>
-              <select
-                value={newEvent.status}
-                onChange={(event) =>
-                  setNewEvent((currentEvent) => ({
-                    ...currentEvent,
-                    status: event.target.value as EventStatus,
-                  }))
-                }
-                className="rounded-lg border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-teal-400"
-              >
-                <option>Open</option>
-                <option>In Review</option>
-                <option>Reviewed</option>
-                <option>Resolved</option>
-              </select>
-            </label>
-
-            <label className="grid gap-2">
-              <span className="text-sm font-semibold text-slate-300">Time</span>
-              <input
-                value={newEvent.time}
-                onChange={(event) =>
-                  setNewEvent((currentEvent) => ({
-                    ...currentEvent,
-                    time: event.target.value,
-                  }))
-                }
-                className="rounded-lg border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-teal-400"
-                placeholder="11:45 AM"
-              />
-            </label>
-
-            <label className="grid gap-2 md:col-span-3">
-              <span className="text-sm font-semibold text-slate-300">Event Notes</span>
-              <textarea
-                value={newEvent.notes}
-                onChange={(event) =>
-                  setNewEvent((currentEvent) => ({
-                    ...currentEvent,
-                    notes: event.target.value,
-                  }))
-                }
-                rows={3}
-                className="rounded-lg border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-teal-400"
-                placeholder="Describe what happened and how it was reviewed."
-              />
-            </label>
-
-            <div className="flex items-end md:col-span-3">
-              <button
-                type="submit"
-                className="w-full rounded-lg bg-teal-500 px-4 py-3 font-semibold text-slate-950 transition hover:bg-teal-400 md:w-auto md:px-8"
-              >
-                Add Event
-              </button>
-            </div>
-          </div>
-        </form>
-      </section>
-
-      <section className="mx-auto grid max-w-7xl gap-6 px-6 pb-10 lg:grid-cols-[0.9fr_1.1fr]">
-        <div className="rounded-2xl border border-white/10 bg-slate-900 p-6 print:border-slate-300 print:bg-white">
-          <div className="mb-5 flex items-center justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-bold">Asset Inventory</h2>
-              <p className="text-sm text-slate-400 print:text-slate-600">
-                Track hosts, IPs, OS, and risk level.
-              </p>
-            </div>
-
-            <select
-              value={assetFilter}
-              onChange={(event) => setAssetFilter(event.target.value)}
-              className="rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-teal-400 print:hidden"
-            >
-              <option>All</option>
-              <option>Critical</option>
-              <option>High</option>
-              <option>Medium</option>
-              <option>Low</option>
-            </select>
-          </div>
-
-          <div className="space-y-3">
-            {filteredAssets.map((asset) => (
-              <button
-                key={asset.id}
-                onClick={() => setSelectedAsset(asset)}
-                className={`w-full rounded-xl border p-4 text-left transition hover:border-teal-400/50 print:border-slate-300 print:bg-white ${
-                  selectedAsset.id === asset.id
-                    ? 'border-teal-400/50 bg-teal-400/10'
-                    : 'border-white/10 bg-slate-950'
-                }`}
-              >
-                <div className="mb-2 flex items-center justify-between gap-3">
-                  <h3 className="font-semibold">{asset.hostname}</h3>
-                  <span
-                    className={`rounded-full border px-3 py-1 text-xs ${severityClass(
-                      asset.risk
-                    )}`}
-                  >
-                    {asset.risk}
-                  </span>
+      {/* ADD FINDING MODAL */}
+      {showAddFinding && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[60] p-6 overflow-auto">
+          <div className="bg-slate-900 border border-white/10 rounded-3xl w-full max-w-2xl my-8">
+            <div className="p-8">
+              <h3 className="text-2xl font-semibold mb-8">New Security Finding</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="md:col-span-2">
+                  <label className="block text-xs text-slate-400 mb-2">TITLE</label>
+                  <input 
+                    type="text" 
+                    value={newFinding.title}
+                    onChange={e => setNewFinding({...newFinding, title: e.target.value})}
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-5 py-3 focus:outline-none focus:border-teal-500"
+                    placeholder="Weak TLS Configuration"
+                  />
                 </div>
 
-                <p className="text-sm text-slate-400 print:text-slate-600">
-                  {asset.ip} • {asset.os}
-                </p>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-white/10 bg-slate-900 p-6 print:border-slate-300 print:bg-white">
-          <h2 className="text-2xl font-bold">Asset Detail</h2>
-          <p className="mt-1 text-sm text-slate-400 print:text-slate-600">
-            Selected host profile and service notes.
-          </p>
-
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
-            <div className="rounded-xl border border-white/10 bg-slate-950 p-4 print:border-slate-300 print:bg-white">
-              <p className="text-sm text-slate-400 print:text-slate-600">Hostname</p>
-              <p className="mt-1 font-semibold">{selectedAsset.hostname}</p>
-            </div>
-
-            <div className="rounded-xl border border-white/10 bg-slate-950 p-4 print:border-slate-300 print:bg-white">
-              <p className="text-sm text-slate-400 print:text-slate-600">IP Address</p>
-              <p className="mt-1 font-semibold">{selectedAsset.ip}</p>
-            </div>
-
-            <div className="rounded-xl border border-white/10 bg-slate-950 p-4 print:border-slate-300 print:bg-white">
-              <p className="text-sm text-slate-400 print:text-slate-600">Operating System</p>
-              <p className="mt-1 font-semibold">{selectedAsset.os}</p>
-            </div>
-
-            <div className="rounded-xl border border-white/10 bg-slate-950 p-4 print:border-slate-300 print:bg-white">
-              <p className="text-sm text-slate-400 print:text-slate-600">Last Seen</p>
-              <p className="mt-1 font-semibold">{selectedAsset.lastSeen}</p>
-            </div>
-          </div>
-
-          <div className="mt-6 rounded-xl border border-white/10 bg-slate-950 p-4 print:border-slate-300 print:bg-white">
-            <p className="mb-3 text-sm font-semibold text-slate-300 print:text-slate-700">
-              Open Ports / Services
-            </p>
-
-            <div className="flex flex-wrap gap-2">
-              {selectedAsset.ports.map((port) => (
-                <span
-                  key={port}
-                  className="rounded-full border border-teal-400/20 bg-teal-400/10 px-3 py-1 text-sm text-teal-300 print:text-slate-700"
-                >
-                  {port}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto grid max-w-7xl gap-6 px-6 pb-10 lg:grid-cols-2">
-        <div className="rounded-2xl border border-white/10 bg-slate-900 p-6 print:border-slate-300 print:bg-white">
-          <h2 className="text-2xl font-bold">Findings Tracker</h2>
-          <p className="mt-1 text-sm text-slate-400 print:text-slate-600">
-            Vulnerability notes and remediation status.
-          </p>
-
-          <div className="mt-6 space-y-4">
-            {findingList.map((finding) => (
-              <div
-                key={finding.id}
-                className="rounded-xl border border-white/10 bg-slate-950 p-4 print:border-slate-300 print:bg-white"
-              >
-                <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-                  <h3 className="font-semibold">{finding.title}</h3>
-                  <span
-                    className={`rounded-full border px-3 py-1 text-xs ${severityClass(
-                      finding.severity
-                    )}`}
+                <div>
+                  <label className="block text-xs text-slate-400 mb-2">AFFECTED ASSET</label>
+                  <select 
+                    value={newFinding.affectedAssetId}
+                    onChange={e => setNewFinding({...newFinding, affectedAssetId: e.target.value})}
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-5 py-3 focus:outline-none focus:border-teal-500"
                   >
-                    {finding.severity}
-                  </span>
-                </div>
-
-                <p className="text-sm text-slate-400 print:text-slate-600">
-                  Asset: {finding.asset}
-                </p>
-
-                <p className="mt-2 text-sm text-slate-300 print:text-slate-700">
-                  Description: {finding.description}
-                </p>
-
-                <p className="mt-2 text-sm text-slate-300 print:text-slate-700">
-                  Evidence: {finding.evidence}
-                </p>
-
-                <p className="mt-2 text-sm text-slate-300 print:text-slate-700">
-                  Recommendation: {finding.recommendation}
-                </p>
-
-                <p className="mt-2 text-sm text-slate-300 print:text-slate-700">
-                  Remediation: {finding.remediation}
-                </p>
-
-                <div className="mt-3 flex flex-wrap items-center gap-3">
-                  <span
-                    className={`rounded-full border px-3 py-1 text-xs ${statusClass(
-                      finding.status
-                    )}`}
-                  >
-                    Status: {finding.status}
-                  </span>
-
-                  <select
-                    value={finding.status}
-                    onChange={(event) =>
-                      updateFindingStatus(
-                        finding.id,
-                        event.target.value as FindingStatus
-                      )
-                    }
-                    className="rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-xs text-slate-100 outline-none focus:border-teal-400 print:hidden"
-                  >
-                    <option>Open</option>
-                    <option>In Review</option>
-                    <option>Planned</option>
-                    <option>Resolved</option>
-                    <option>Risk Accepted</option>
-                    <option>False Positive</option>
+                    <option value="">Select Asset...</option>
+                    {assets.map(a => (
+                      <option key={a.id} value={a.id}>{a.hostname}</option>
+                    ))}
                   </select>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
 
-        <div className="rounded-2xl border border-white/10 bg-slate-900 p-6 print:border-slate-300 print:bg-white">
-          <h2 className="text-2xl font-bold">Security Events</h2>
-          <p className="mt-1 text-sm text-slate-400 print:text-slate-600">
-            Recent lab activity and review queue.
-          </p>
-
-          <div className="mt-6 space-y-4">
-            {eventList.map((event) => (
-              <div
-                key={event.id}
-                className="rounded-xl border border-white/10 bg-slate-950 p-4 print:border-slate-300 print:bg-white"
-              >
-                <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-                  <h3 className="font-semibold">{event.type}</h3>
-                  <span
-                    className={`rounded-full border px-3 py-1 text-xs ${severityClass(
-                      event.severity
-                    )}`}
+                <div>
+                  <label className="block text-xs text-slate-400 mb-2">SEVERITY</label>
+                  <select 
+                    value={newFinding.severity}
+                    onChange={e => setNewFinding({...newFinding, severity: e.target.value as RiskLevel})}
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-5 py-3 focus:outline-none focus:border-teal-500"
                   >
-                    {event.severity}
-                  </span>
-                </div>
-
-                <p className="text-sm text-slate-400 print:text-slate-600">
-                  {event.source} → {event.destination}
-                </p>
-
-                <p className="mt-2 text-sm text-slate-300 print:text-slate-700">
-                  {event.time} • {event.notes}
-                </p>
-
-                <div className="mt-3 flex flex-wrap items-center gap-3">
-                  <span
-                    className={`rounded-full border px-3 py-1 text-xs ${statusClass(
-                      event.status
-                    )}`}
-                  >
-                    Status: {event.status}
-                  </span>
-
-                  <select
-                    value={event.status}
-                    onChange={(selectEvent) =>
-                      updateEventStatus(
-                        event.id,
-                        selectEvent.target.value as EventStatus
-                      )
-                    }
-                    className="rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-xs text-slate-100 outline-none focus:border-teal-400 print:hidden"
-                  >
-                    <option>Open</option>
-                    <option>In Review</option>
-                    <option>Reviewed</option>
-                    <option>Resolved</option>
+                    <option value="Critical">Critical</option>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
                   </select>
                 </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-xs text-slate-400 mb-2">DESCRIPTION</label>
+                  <textarea 
+                    value={newFinding.description}
+                    onChange={e => setNewFinding({...newFinding, description: e.target.value})}
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-5 py-4 h-24 focus:outline-none focus:border-teal-500"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-xs text-slate-400 mb-2">EVIDENCE / REFERENCES</label>
+                  <textarea 
+                    value={newFinding.evidence}
+                    onChange={e => setNewFinding({...newFinding, evidence: e.target.value})}
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-5 py-4 h-20 focus:outline-none focus:border-teal-500"
+                    placeholder="Nmap output, Burp screenshot, etc."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs text-slate-400 mb-2">RECOMMENDATION</label>
+                  <textarea 
+                    value={newFinding.recommendation}
+                    onChange={e => setNewFinding({...newFinding, recommendation: e.target.value})}
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-5 py-4 h-24 focus:outline-none focus:border-teal-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs text-slate-400 mb-2">REMEDIATION STEPS</label>
+                  <textarea 
+                    value={newFinding.remediation}
+                    onChange={e => setNewFinding({...newFinding, remediation: e.target.value})}
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-5 py-4 h-24 focus:outline-none focus:border-teal-500 font-mono text-xs"
+                  />
+                </div>
               </div>
-            ))}
+            </div>
+            
+            <div className="border-t border-white/10 p-4 flex gap-3">
+              <button onClick={() => setShowAddFinding(false)} className="flex-1 py-4 text-slate-400 hover:bg-slate-800 rounded-2xl">Cancel</button>
+              <button onClick={addFinding} className="flex-1 py-4 bg-teal-600 hover:bg-teal-500 rounded-2xl font-medium">Create Finding</button>
+            </div>
           </div>
         </div>
-      </section>
+      )}
 
-      <section className="mx-auto max-w-7xl px-6 pb-12">
-        <div className="rounded-2xl border border-white/10 bg-slate-900 p-6 print:border-slate-300 print:bg-white">
-          <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-end">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.25em] text-teal-400 print:text-slate-700">
-                Printable Report
-              </p>
-              <h2 className="mt-2 text-2xl font-bold">
-                Security Lab Summary Report
-              </h2>
-              <p className="mt-2 text-sm text-slate-400 print:text-slate-600">
-                Report date: {reportDate}. Use the print button at the top to
-                save this page as a PDF.
-              </p>
+      {/* ADD EVENT MODAL */}
+      {showAddEvent && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[60] p-6">
+          <div className="bg-slate-900 border border-white/10 rounded-3xl w-full max-w-lg">
+            <div className="p-8">
+              <h3 className="text-2xl font-semibold mb-8">Log Security Event</h3>
+              
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-xs text-slate-400 mb-2">EVENT TYPE</label>
+                  <input 
+                    type="text" 
+                    value={newEvent.eventType}
+                    onChange={e => setNewEvent({...newEvent, eventType: e.target.value})}
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-5 py-3"
+                    placeholder="Brute Force Attempt"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs text-slate-400 mb-2">SOURCE IP</label>
+                    <input 
+                      type="text" 
+                      value={newEvent.sourceIP}
+                      onChange={e => setNewEvent({...newEvent, sourceIP: e.target.value})}
+                      className="w-full bg-slate-950 border border-white/10 rounded-xl px-5 py-3 font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-slate-400 mb-2">DEST IP</label>
+                    <input 
+                      type="text" 
+                      value={newEvent.destIP}
+                      onChange={e => setNewEvent({...newEvent, destIP: e.target.value})}
+                      className="w-full bg-slate-950 border border-white/10 rounded-xl px-5 py-3 font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs text-slate-400 mb-2">RELATED ASSET (optional)</label>
+                  <select 
+                    value={newEvent.relatedAssetId}
+                    onChange={e => setNewEvent({...newEvent, relatedAssetId: e.target.value})}
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-5 py-3"
+                  >
+                    <option value="">None</option>
+                    {assets.map(a => <option key={a.id} value={a.id}>{a.hostname}</option>)}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs text-slate-400 mb-2">NOTES</label>
+                  <textarea 
+                    value={newEvent.notes}
+                    onChange={e => setNewEvent({...newEvent, notes: e.target.value})}
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-5 py-4 h-32"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-
-          <div className="grid gap-6 lg:grid-cols-2">
-            <div className="rounded-xl border border-white/10 bg-slate-950 p-4 print:border-slate-300 print:bg-white">
-              <h3 className="font-bold">Executive Summary</h3>
-              <p className="mt-2 text-sm leading-7 text-slate-300 print:text-slate-700">
-                This report summarizes the current security lab inventory,
-                unresolved findings, observed security events, and recommended
-                corrective actions. The console is designed to document authorized
-                lab activity and track remediation progress.
-              </p>
+            
+            <div className="border-t border-white/10 p-4 flex gap-3">
+              <button onClick={() => setShowAddEvent(false)} className="flex-1 py-4 text-slate-400 hover:bg-slate-800 rounded-2xl">Cancel</button>
+              <button onClick={addEvent} className="flex-1 py-4 bg-teal-600 hover:bg-teal-500 rounded-2xl font-medium">Log Event</button>
             </div>
-
-            <div className="rounded-xl border border-white/10 bg-slate-950 p-4 print:border-slate-300 print:bg-white">
-              <h3 className="font-bold">Remediation Priorities</h3>
-              <ul className="mt-2 space-y-2 text-sm text-slate-300 print:text-slate-700">
-                {unresolvedFindings.slice(0, 5).map((finding) => (
-                  <li key={finding.id}>
-                    • {finding.severity}: {finding.title} on {finding.asset}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          <div className="mt-6 rounded-xl border border-teal-400/20 bg-teal-400/10 p-4 print:border-slate-300 print:bg-white">
-            <h3 className="font-bold">Next Build Steps</h3>
-            <p className="mt-2 text-sm leading-7 text-slate-300 print:text-slate-700">
-              Next planned phases: CSV/Nmap import, Supabase database,
-              screenshot evidence uploads, and controlled scan profile planning.
-            </p>
           </div>
         </div>
-      </section>
-    </main>
-  )
+      )}
+
+      {/* CSV IMPORT MODAL */}
+      {showImportCSV && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[60] p-6">
+          <div className="bg-slate-900 border border-white/10 rounded-3xl w-full max-w-lg">
+            <div className="p-8">
+              <h3 className="text-xl font-semibold mb-2">Import Assets from CSV</h3>
+              <p className="text-xs text-slate-400 mb-6">Format: hostname,ip,os,risk,ports</p>
+              
+              <textarea 
+                value={csvInput}
+                onChange={e => setCsvInput(e.target.value)}
+                className="w-full h-64 bg-slate-950 font-mono text-xs border border-white/10 rounded-2xl p-6 focus:outline-none focus:border-teal-500"
+                placeholder="ubuntu-lab,192.168.50.10,Ubuntu Linux,Medium,&quot;22/tcp SSH, 80/tcp HTTP&quot;&#10;windows-test,192.168.50.20,Windows Server,High,&quot;445/tcp SMB&quot;"
+              />
+              
+              <div className="text-[10px] text-amber-400 mt-4">⚠️ Only run authorized scans against your own lab systems.</div>
+            </div>
+            
+            <div className="border-t border-white/10 p-4 flex gap-3">
+              <button onClick={() => setShowImportCSV(false)} className="flex-1 py-4 text-slate-400 hover:bg-slate-800 rounded-2xl">Cancel</button>
+              <button onClick={importCSV} className="flex-1 py-4 bg-teal-600 hover:bg-teal-500 rounded-2xl font-medium">Import Assets</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Footer note */}
+      <div className="text-center py-12 text-xs text-slate-600 border-t border-white/5 mt-20">
+        SyferSec Lab Console • Portfolio demonstration • All data stored in browser memory only
+      </div>
+    </div>
+  );
 }
