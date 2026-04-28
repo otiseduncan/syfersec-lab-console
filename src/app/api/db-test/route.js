@@ -1,22 +1,20 @@
-import { sql } from "@/lib/db";
+﻿export const runtime = "nodejs";
 
 export async function GET() {
-  try {
-    const result = await sql`SELECT NOW() as current_time`;
+  const hasDatabase = Boolean(process.env.DATABASE_URL);
 
+  if (!hasDatabase) {
     return Response.json({
       ok: true,
-      message: "Connected to Neon database",
-      time: result[0].current_time,
+      databaseConfigured: false,
+      message: "DATABASE_URL is not configured. This deployment is running in demo/local portfolio mode.",
+      note: "Real database-backed features require DATABASE_URL. Real Nmap scanning requires local execution on Omega.",
     });
-  } catch (error) {
-    return Response.json(
-      {
-        ok: false,
-        message: "Database connection failed",
-        error: error.message,
-      },
-      { status: 500 }
-    );
   }
+
+  return Response.json({
+    ok: true,
+    databaseConfigured: true,
+    message: "DATABASE_URL is configured.",
+  });
 }
