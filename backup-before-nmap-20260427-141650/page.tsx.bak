@@ -1,6 +1,29 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+// ─── Dashboard API Types ────────────────────────────────────────────────
+interface DashboardAsset {
+  id: string;
+  hostname: string;
+  ip_address: string;
+  risk_level: string;
+}
+interface DashboardFinding {
+  id: string;
+  title: string;
+  severity: string;
+  status: string;
+  hostname: string;
+}
+interface DashboardData {
+  totalAssets: number;
+  highRiskAssets: number;
+  openFindings: number;
+  criticalFindings: number;
+  eventsPendingReview: number;
+  recentAssets: DashboardAsset[];
+  recentFindings: DashboardFinding[];
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -204,11 +227,30 @@ type Tab = 'dashboard' | 'assets' | 'findings' | 'events' | 'import' | 'planning
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function SyferSecConsole() {
+  // Dashboard API state
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [dashboardLoading, setDashboardLoading] = useState(false);
+  const [dashboardError, setDashboardError] = useState<string | null>(null);
+
+  // Local state (for non-dashboard tabs)
   const [assets, setAssets]   = useState<Asset[]>(SEED_ASSETS);
   const [findings, setFindings] = useState<Finding[]>(SEED_FINDINGS);
   const [events, setEvents]   = useState<SecurityEvent[]>(SEED_EVENTS);
-
   const [currentTab, setCurrentTab] = useState<Tab>('dashboard');
+  // Fetch dashboard data on load
+  useEffect(() => {
+    if (currentTab !== 'dashboard') return;
+    setDashboardLoading(true);
+    setDashboardError(null);
+    fetch('/api/dashboard')
+      .then(async (res) => {
+        if (!res.ok) throw new Error('API error');
+        const data = await res.json();
+        setDashboardData(data);
+      })
+      .catch(() => setDashboardError('Could not load dashboard data.'))
+      .finally(() => setDashboardLoading(false));
+  }, [currentTab]);
 
   // Asset state
   const [selectedAssetId, setSelectedAssetId] = useState<string>(SEED_ASSETS[0].id);
@@ -231,12 +273,12 @@ export default function SyferSecConsole() {
   const [csvText, setCsvText] = useState('');
   const [csvResult, setCsvResult] = useState('');
 
-  // ── Computed metrics ──
-  const totalAssets        = assets.length;
-  const highRiskAssets     = assets.filter(a => a.riskLevel === 'Critical' || a.riskLevel === 'High').length;
-  const openFindings       = findings.filter(f => isOpenFinding(f.status)).length;
-  const criticalFindings   = findings.filter(f => f.severity === 'Critical').length;
-  const eventsNeedReview   = events.filter(e => isOpenEvent(e.status)).length;
+  // ── Computed metrics (dashboard summary) ──
+  const totalAssets        = currentTab === 'dashboard' && dashboardData ? dashboardData.totalAssets : assets.length;
+  const highRiskAssets     = currentTab === 'dashboard' && dashboardData ? dashboardData.highRiskAssets : assets.filter(a => a.riskLevel === 'Critical' || a.riskLevel === 'High').length;
+  const openFindings       = currentTab === 'dashboard' && dashboardData ? dashboardData.openFindings : findings.filter(f => isOpenFinding(f.status)).length;
+  const criticalFindings   = currentTab === 'dashboard' && dashboardData ? dashboardData.criticalFindings : findings.filter(f => f.severity === 'Critical').length;
+  const eventsNeedReview   = currentTab === 'dashboard' && dashboardData ? dashboardData.eventsPendingReview : events.filter(e => isOpenEvent(e.status)).length;
 
   // ── Derived ──
   const selectedAsset = useMemo(() => assets.find(a => a.id === selectedAssetId) ?? assets[0], [assets, selectedAssetId]);
@@ -475,56 +517,67 @@ export default function SyferSecConsole() {
                 </div>
               </div>
 
-              {/* Metric cards */}
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-                {[
-                  { label: 'Total Assets',         value: totalAssets,      color: 'text-teal-400',   dot: 'bg-teal-400' },
-                  { label: 'High-Risk Assets',      value: highRiskAssets,   color: 'text-orange-400', dot: 'bg-orange-400' },
-                  { label: 'Open Findings',         value: openFindings,     color: 'text-red-400',    dot: 'bg-red-400' },
-                  { label: 'Critical Findings',     value: criticalFindings, color: 'text-red-500',    dot: 'bg-red-500' },
-                  { label: 'Events Needing Review', value: eventsNeedReview, color: 'text-yellow-400', dot: 'bg-yellow-400' },
-                ].map(card => (
-                  <div key={card.label} className="bg-slate-900 border border-white/10 rounded-xl p-5">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className={`w-2 h-2 rounded-full ${card.dot}`}></span>
-                      <span className="text-xs text-slate-500 uppercase tracking-wider">{card.label}</span>
-                    </div>
-                    <div className={`text-4xl font-bold ${card.color}`}>{card.value}</div>
-                  </div>
-                ))}
-              </div>
+              {/* Error banner */}
+              {dashboardError && (
+                <div className="mb-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg px-4 py-3 text-sm">
+                  {dashboardError}
+                </div>
+              )}
 
-              {/* Quick summary tables */}
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-slate-900 border border-white/10 rounded-xl p-5">
-                  <h3 className="text-sm font-semibold text-slate-300 mb-4">Recent Assets</h3>
-                  <div className="space-y-2">
-                    {assets.slice(0,5).map(a => (
-                      <div key={a.id} className="flex items-center justify-between text-sm">
-                        <span className="text-slate-300 font-mono">{a.hostname}</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-slate-500 text-xs">{a.ip}</span>
-                          <span className={`text-xs px-2 py-0.5 rounded-full ${riskBadge(a.riskLevel)}`}>{a.riskLevel}</span>
+              {/* Loading state */}
+              {dashboardLoading ? (
+                <div className="text-slate-400 text-center py-12">Loading dashboard...</div>
+              ) : (
+                <>
+                  {/* Metric cards */}
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+                    {[
+                      { label: 'Total Assets',         value: dashboardData?.totalAssets ?? 0,      color: 'text-teal-400',   dot: 'bg-teal-400' },
+                      { label: 'High-Risk Assets',      value: dashboardData?.highRiskAssets ?? 0,   color: 'text-orange-400', dot: 'bg-orange-400' },
+                      { label: 'Open Findings',         value: dashboardData?.openFindings ?? 0,     color: 'text-red-400',    dot: 'bg-red-400' },
+                      { label: 'Critical Findings',     value: dashboardData?.criticalFindings ?? 0, color: 'text-red-500',    dot: 'bg-red-500' },
+                      { label: 'Events Needing Review', value: dashboardData?.eventsPendingReview ?? 0, color: 'text-yellow-400', dot: 'bg-yellow-400' },
+                    ].map(card => (
+                      <div key={card.label} className="bg-slate-900 border border-white/10 rounded-xl p-5">
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className={`w-2 h-2 rounded-full ${card.dot}`}></span>
+                          <span className="text-xs text-slate-500 uppercase tracking-wider">{card.label}</span>
                         </div>
+                        <div className={`text-4xl font-bold ${card.color}`}>{card.value}</div>
                       </div>
                     ))}
                   </div>
-                </div>
-                <div className="bg-slate-900 border border-white/10 rounded-xl p-5">
-                  <h3 className="text-sm font-semibold text-slate-300 mb-4">Open Findings</h3>
-                  <div className="space-y-2">
-                    {findings.filter(f => isOpenFinding(f.status)).slice(0,5).map(f => (
-                      <div key={f.id} className="flex items-center justify-between text-sm">
-                        <span className="text-slate-300 truncate max-w-[60%]">{f.title}</span>
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${riskBadge(f.severity)}`}>{f.severity}</span>
+
+                  {/* Quick summary tables */}
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="bg-slate-900 border border-white/10 rounded-xl p-5">
+                      <h3 className="text-sm font-semibold text-slate-300 mb-4">Recent Assets</h3>
+                      <div className="space-y-2">
+                        {dashboardData?.recentAssets?.length ? dashboardData.recentAssets.slice(0,5).map(a => (
+                          <div key={a.id} className="flex items-center justify-between text-sm">
+                            <span className="text-slate-300 font-mono">{a.hostname}</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-slate-500 text-xs">{a.ip_address}</span>
+                              <span className={`text-xs px-2 py-0.5 rounded-full ${riskBadge(a.risk_level as RiskLevel)}`}>{a.risk_level}</span>
+                            </div>
+                          </div>
+                        )) : <p className="text-slate-500 text-xs">No recent assets.</p>}
                       </div>
-                    ))}
-                    {findings.filter(f => isOpenFinding(f.status)).length === 0 && (
-                      <p className="text-slate-500 text-xs">No open findings.</p>
-                    )}
+                    </div>
+                    <div className="bg-slate-900 border border-white/10 rounded-xl p-5">
+                      <h3 className="text-sm font-semibold text-slate-300 mb-4">Open Findings</h3>
+                      <div className="space-y-2">
+                        {dashboardData?.recentFindings?.length ? dashboardData.recentFindings.slice(0,5).map(f => (
+                          <div key={f.id} className="flex items-center justify-between text-sm">
+                            <span className="text-slate-300 truncate max-w-[60%]">{f.title}</span>
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${riskBadge(f.severity as RiskLevel)}`}>{f.severity}</span>
+                          </div>
+                        )) : <p className="text-slate-500 text-xs">No open findings.</p>}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                </>
+              )}
             </div>
           )}
 

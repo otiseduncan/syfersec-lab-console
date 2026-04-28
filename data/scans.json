@@ -1,0 +1,1387 @@
+[
+  {
+    "id": "scan-1777373384870",
+    "target": "192.168.50.175,192.168.50.242,192.168.50.200,192.168.50.199,192.168.50.173,192.168.50.165,192.168.50.55,192.168.50.1,192.168.50.5,192.168.50.10,192.168.50.27,192.168.50.30,",
+    "modeId": "service-detection",
+    "modeName": "Service Detection",
+    "args": [
+      "-sT",
+      "-sV",
+      "-p",
+      "22,53,80,135,139,443,445,3389,3000,3306,5432,8080,8443",
+      "-T3",
+      "-oX",
+      "-",
+      "192.168.50.175",
+      "192.168.50.242",
+      "192.168.50.200",
+      "192.168.50.199",
+      "192.168.50.173",
+      "192.168.50.165",
+      "192.168.50.55",
+      "192.168.50.1",
+      "192.168.50.5",
+      "192.168.50.10",
+      "192.168.50.27",
+      "192.168.50.30"
+    ],
+    "safeCommandPreview": "nmap -sT -sV -p 22,53,80,135,139,443,445,3389,3000,3306,5432,8080,8443 -T3 -oX - 192.168.50.175 192.168.50.242 192.168.50.200 192.168.50.199 192.168.50.173 192.168.50.165 192.168.50.55 192.168.50.1 192.168.50.5 192.168.50.10 192.168.50.27 192.168.50.30",
+    "status": "completed",
+    "startedAt": "2026-04-28T10:46:52.028Z",
+    "completedAt": "2026-04-28T10:49:44.863Z",
+    "durationMs": 172835,
+    "rawOutput": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<!DOCTYPE nmaprun>\r\n<?xml-stylesheet href=\"file:///C:/Program Files (x86)/Nmap/nmap.xsl\" type=\"text/xsl\"?>\r\n<!-- Nmap 7.80 scan initiated Tue Apr 28 06:46:52 2026 as: &quot;C:\\\\Program Files (x86)\\\\Nmap\\\\nmap.exe&quot; -&#45;stats-every 5s -sT -sV -p 22,53,80,135,139,443,445,3389,3000,3306,5432,8080,8443 -T3 -oX - 192.168.50.175 192.168.50.242 192.168.50.200 192.168.50.199 192.168.50.173 192.168.50.165 192.168.50.55 192.168.50.1 192.168.50.5 192.168.50.10 192.168.50.27 192.168.50.30 -->\r\n<nmaprun scanner=\"nmap\" args=\"&quot;C:\\\\Program Files (x86)\\\\Nmap\\\\nmap.exe&quot; -&#45;stats-every 5s -sT -sV -p 22,53,80,135,139,443,445,3389,3000,3306,5432,8080,8443 -T3 -oX - 192.168.50.175 192.168.50.242 192.168.50.200 192.168.50.199 192.168.50.173 192.168.50.165 192.168.50.55 192.168.50.1 192.168.50.5 192.168.50.10 192.168.50.27 192.168.50.30\" start=\"1777373212\" startstr=\"Tue Apr 28 06:46:52 2026\" version=\"7.80\" xmloutputversion=\"1.04\">\r\n<scaninfo type=\"connect\" protocol=\"tcp\" numservices=\"13\" services=\"22,53,80,135,139,443,445,3000,3306,3389,5432,8080,8443\"/>\r\n<verbose level=\"0\"/>\r\n<debugging level=\"0\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373220\" percent=\"0.00\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373225\" percent=\"75.00\" remaining=\"4\" etc=\"1777373229\"/>\r\n<host starttime=\"1777373213\" endtime=\"1777373226\"><status state=\"up\" reason=\"localhost-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.175\" addrtype=\"ipv4\"/>\r\n<hostnames>\r\n<hostname name=\"host.docker.internal\" type=\"PTR\"/>\r\n</hostnames>\r\n<ports><port protocol=\"tcp\" portid=\"22\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ssh\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"53\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"domain\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"80\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"135\"><state state=\"open\" reason=\"syn-ack\" reason_ttl=\"0\"/><service name=\"msrpc\" product=\"Microsoft Windows RPC\" ostype=\"Windows\" method=\"probed\" conf=\"10\"><cpe>cpe:/o:microsoft:windows</cpe></service></port>\r\n<port protocol=\"tcp\" portid=\"139\"><state state=\"open\" reason=\"syn-ack\" reason_ttl=\"0\"/><service name=\"netbios-ssn\" product=\"Microsoft Windows netbios-ssn\" ostype=\"Windows\" method=\"probed\" conf=\"10\"><cpe>cpe:/o:microsoft:windows</cpe></service></port>\r\n<port protocol=\"tcp\" portid=\"443\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"https\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"445\"><state state=\"open\" reason=\"syn-ack\" reason_ttl=\"0\"/><service name=\"microsoft-ds\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3000\"><state state=\"open\" reason=\"syn-ack\" reason_ttl=\"0\"/><service name=\"ppp\" servicefp=\"SF-Port3000-TCP:V=7.80%I=7%D=4/28%Time=69F09029%P=i686-pc-windows-windows%r(GetRequest,2AF6,&quot;HTTP/1\\.1\\x20200\\x20OK\\r\\nVary:\\x20rsc,\\x20next-router-state-tree,\\x20next-router-prefetch,\\x20next-router-segment-prefetch,\\x20Accept-Encoding\\r\\nCache-Control:\\x20no-cache,\\x20must-revalidate\\r\\nX-Powered-By:\\x20Next\\.js\\r\\nContent-Type:\\x20text/html;\\x20charset=utf-8\\r\\nDate:\\x20Tue,\\x2028\\x20Apr\\x202026\\x2010:47:05\\x20GMT\\r\\nConnection:\\x20close\\r\\n\\r\\n&lt;!DOCTYPE\\x20html&gt;&lt;html\\x20lang=\\&quot;en\\&quot;&gt;&lt;head&gt;&lt;meta\\x20charSet=\\&quot;utf-8\\&quot;/&gt;&lt;meta\\x20name=\\&quot;viewport\\&quot;\\x20content=\\&quot;width=device-width,\\x20initial-scale=1\\&quot;/&gt;&lt;link\\x20rel=\\&quot;stylesheet\\&quot;\\x20href=\\&quot;/_next/static/css/app/layout\\.css\\?v=1777373225597\\&quot;\\x20data-precedence=\\&quot;next_static/css/app/layout\\.css\\&quot;/&gt;&lt;link\\x20rel=\\&quot;preload\\&quot;\\x20as=\\&quot;script\\&quot;\\x20fetchPriority=\\&quot;low\\&quot;\\x20href=\\&quot;/_next/static/chunks/webpack\\.js\\?v=1777373225597\\&quot;/&gt;&lt;script\\x20src=\\&quot;/_next/static/chunks/main-app\\.js\\?v=1777373225597\\&quot;\\x20async=\\&quot;\\&quot;&gt;&lt;/script&gt;&lt;script\\x20src=\\&quot;/_next/static/chunks/app-pages-internals\\.js\\&quot;\\x20async=\\&quot;\\&quot;&gt;&lt;/script&gt;&lt;script\\x20src=\\&quot;/_next/static/chunks/app/page\\.js\\&quot;\\x20async=\\&quot;\\&quot;&gt;&lt;/script&gt;&lt;title&gt;SyferSec\\x20Lab\\x20Console&lt;&quot;)%r(Help,2F,&quot;HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nConnection:\\x20close\\r\\n\\r\\n&quot;)%r(NCP,2F,&quot;HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nConnection:\\x20close\\r\\n\\r\\n&quot;)%r(HTTPOptions,AB,&quot;HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nvary:\\x20rsc,\\x20next-router-state-tree,\\x20next-router-prefetch,\\x20next-router-segment-prefetch\\r\\nDate:\\x20Tue,\\x2028\\x20Apr\\x202026\\x2010:47:05\\x20GMT\\r\\nConnection:\\x20close\\r\\n\\r\\n&quot;)%r(RTSPRequest,AB,&quot;HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nvary:\\x20rsc,\\x20next-router-state-tree,\\x20next-router-prefetch,\\x20next-router-segment-prefetch\\r\\nDate:\\x20Tue,\\x2028\\x20Apr\\x202026\\x2010:47:05\\x20GMT\\r\\nConnection:\\x20close\\r\\n\\r\\n&quot;)%r(RPCCheck,2F,&quot;HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nConnection:\\x20close\\r\\n\\r\\n&quot;)%r(DNSVersionBindReqTCP,2F,&quot;HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nConnection:\\x20close\\r\\n\\r\\n&quot;)%r(DNSStatusRequestTCP,2F,&quot;HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nConnection:\\x20close\\r\\n\\r\\n&quot;);\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3306\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"mysql\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3389\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ms-wbt-server\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"5432\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"postgresql\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"8080\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http-proxy\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"8443\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"https-alt\" method=\"table\" conf=\"3\"/></port>\r\n</ports>\r\n<times srtt=\"425\" rttvar=\"2695\" to=\"100000\"/>\r\n</host>\r\n<taskprogress task=\"Connect Scan\" time=\"1777373227\" percent=\"4.62\" remaining=\"21\" etc=\"1777373248\"/>\r\n<taskprogress task=\"Connect Scan\" time=\"1777373232\" percent=\"60.38\" remaining=\"4\" etc=\"1777373236\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373240\" percent=\"12.50\" remaining=\"43\" etc=\"1777373282\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373245\" percent=\"50.00\" remaining=\"12\" etc=\"1777373256\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373248\" percent=\"50.00\" remaining=\"15\" etc=\"1777373262\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373252\" percent=\"50.00\" remaining=\"19\" etc=\"1777373270\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373257\" percent=\"50.00\" remaining=\"24\" etc=\"1777373280\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373262\" percent=\"50.00\" remaining=\"29\" etc=\"1777373290\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373267\" percent=\"50.00\" remaining=\"34\" etc=\"1777373300\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373272\" percent=\"50.00\" remaining=\"39\" etc=\"1777373310\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373277\" percent=\"50.00\" remaining=\"44\" etc=\"1777373320\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373282\" percent=\"50.00\" remaining=\"49\" etc=\"1777373330\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373287\" percent=\"50.00\" remaining=\"54\" etc=\"1777373340\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373292\" percent=\"50.00\" remaining=\"59\" etc=\"1777373350\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373297\" percent=\"62.50\" remaining=\"38\" etc=\"1777373335\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373302\" percent=\"62.50\" remaining=\"41\" etc=\"1777373343\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373307\" percent=\"62.50\" remaining=\"44\" etc=\"1777373351\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373312\" percent=\"62.50\" remaining=\"47\" etc=\"1777373359\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373317\" percent=\"62.50\" remaining=\"50\" etc=\"1777373367\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373322\" percent=\"75.00\" remaining=\"30\" etc=\"1777373351\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373330\" percent=\"87.50\" remaining=\"14\" etc=\"1777373344\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373335\" percent=\"87.50\" remaining=\"15\" etc=\"1777373349\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373340\" percent=\"87.50\" remaining=\"16\" etc=\"1777373355\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373345\" percent=\"87.50\" remaining=\"16\" etc=\"1777373361\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373350\" percent=\"87.50\" remaining=\"17\" etc=\"1777373367\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373355\" percent=\"87.50\" remaining=\"18\" etc=\"1777373372\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373360\" percent=\"87.50\" remaining=\"19\" etc=\"1777373378\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373365\" percent=\"87.50\" remaining=\"19\" etc=\"1777373384\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373370\" percent=\"87.50\" remaining=\"20\" etc=\"1777373389\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777373375\" percent=\"100.00\" remaining=\"1\" etc=\"1777373375\"/>\r\n<taskprogress task=\"NSE\" time=\"1777373377\" percent=\"98.84\" remaining=\"1\" etc=\"1777373377\"/>\r\n<taskprogress task=\"NSE\" time=\"1777373382\" percent=\"50.00\" remaining=\"2\" etc=\"1777373383\"/>\r\n<host starttime=\"1777373212\" endtime=\"1777373382\"><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.200\" addrtype=\"ipv4\"/>\r\n<address addr=\"00:C0:CA:B6:6E:B2\" addrtype=\"mac\" vendor=\"ALFA\"/>\r\n<hostnames>\r\n<hostname name=\"DESKTOP-PIQDV2I\" type=\"PTR\"/>\r\n</hostnames>\r\n<ports><port protocol=\"tcp\" portid=\"22\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ssh\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"53\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"domain\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"80\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"135\"><state state=\"open\" reason=\"syn-ack\" reason_ttl=\"0\"/><service name=\"msrpc\" product=\"Microsoft Windows RPC\" ostype=\"Windows\" method=\"probed\" conf=\"10\"><cpe>cpe:/o:microsoft:windows</cpe></service></port>\r\n<port protocol=\"tcp\" portid=\"139\"><state state=\"open\" reason=\"syn-ack\" reason_ttl=\"0\"/><service name=\"netbios-ssn\" product=\"Microsoft Windows netbios-ssn\" ostype=\"Windows\" method=\"probed\" conf=\"10\"><cpe>cpe:/o:microsoft:windows</cpe></service></port>\r\n<port protocol=\"tcp\" portid=\"443\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"https\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"445\"><state state=\"open\" reason=\"syn-ack\" reason_ttl=\"0\"/><service name=\"microsoft-ds\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3000\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ppp\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3306\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"mysql\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3389\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ms-wbt-server\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"5432\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"postgresql\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"8080\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http-proxy\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"8443\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"https-alt\" method=\"table\" conf=\"3\"/></port>\r\n</ports>\r\n<times srtt=\"21674\" rttvar=\"18374\" to=\"100000\"/>\r\n</host>\r\n<host starttime=\"1777373212\" endtime=\"1777373234\"><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.199\" addrtype=\"ipv4\"/>\r\n<address addr=\"68:DB:F5:2E:D5:8F\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<ports><port protocol=\"tcp\" portid=\"22\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ssh\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"53\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"domain\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"80\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"135\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"msrpc\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"139\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"netbios-ssn\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"443\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"https\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"445\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"microsoft-ds\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3000\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ppp\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3306\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"mysql\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3389\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ms-wbt-server\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"5432\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"postgresql\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"8080\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http-proxy\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"8443\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"https-alt\" method=\"table\" conf=\"3\"/></port>\r\n</ports>\r\n<times srtt=\"16000\" rttvar=\"16000\" to=\"100000\"/>\r\n</host>\r\n<host starttime=\"1777373212\" endtime=\"1777373233\"><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.173\" addrtype=\"ipv4\"/>\r\n<address addr=\"3C:FA:06:CA:44:45\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<ports><port protocol=\"tcp\" portid=\"22\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ssh\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"53\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"domain\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"80\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"135\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"msrpc\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"139\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"netbios-ssn\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"443\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"https\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"445\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"microsoft-ds\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3000\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ppp\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3306\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"mysql\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3389\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ms-wbt-server\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"5432\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"postgresql\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"8080\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http-proxy\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"8443\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"https-alt\" method=\"table\" conf=\"3\"/></port>\r\n</ports>\r\n<times srtt=\"1000\" rttvar=\"5000\" to=\"100000\"/>\r\n</host>\r\n<host starttime=\"1777373212\" endtime=\"1777373232\"><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.165\" addrtype=\"ipv4\"/>\r\n<address addr=\"34:FC:99:97:C6:7C\" addrtype=\"mac\"/>\r\n<hostnames>\r\n<hostname name=\"Samsung-Range\" type=\"PTR\"/>\r\n</hostnames>\r\n<ports><port protocol=\"tcp\" portid=\"22\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ssh\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"53\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"domain\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"80\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"135\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"msrpc\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"139\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"netbios-ssn\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"443\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"https\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"445\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"microsoft-ds\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3000\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ppp\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3306\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"mysql\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3389\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ms-wbt-server\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"5432\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"postgresql\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"8080\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http-proxy\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"8443\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"https-alt\" method=\"table\" conf=\"3\"/></port>\r\n</ports>\r\n<times srtt=\"66000\" rttvar=\"66000\" to=\"330000\"/>\r\n</host>\r\n<host starttime=\"1777373212\" endtime=\"1777373234\"><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.55\" addrtype=\"ipv4\"/>\r\n<address addr=\"84:C8:A0:CC:03:80\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<ports><port protocol=\"tcp\" portid=\"22\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ssh\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"53\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"domain\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"80\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"135\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"msrpc\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"139\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"netbios-ssn\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"443\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"https\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"445\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"microsoft-ds\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3000\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ppp\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3306\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"mysql\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3389\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ms-wbt-server\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"5432\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"postgresql\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"8080\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http-proxy\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"8443\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"https-alt\" method=\"table\" conf=\"3\"/></port>\r\n</ports>\r\n<times srtt=\"30000\" rttvar=\"30000\" to=\"150000\"/>\r\n</host>\r\n<host starttime=\"1777373212\" endtime=\"1777373384\"><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.1\" addrtype=\"ipv4\"/>\r\n<address addr=\"BC:FC:E7:25:37:58\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<ports><port protocol=\"tcp\" portid=\"22\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ssh\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"53\"><state state=\"open\" reason=\"syn-ack\" reason_ttl=\"0\"/><service name=\"domain\" servicefp=\"SF-Port53-TCP:V=7.80%I=7%D=4/28%Time=69F0903D%P=i686-pc-windows-windows%r(DNSVersionBindReqTCP,20,&quot;\\0\\x1e\\0\\x06\\x81\\x84\\0\\x01\\0\\0\\0\\0\\0\\0\\x07version\\x04bind\\0\\0\\x10\\0\\x03&quot;);\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"80\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"135\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"msrpc\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"139\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"netbios-ssn\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"443\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"https\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"445\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"microsoft-ds\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3000\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ppp\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3306\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"mysql\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3389\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ms-wbt-server\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"5432\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"postgresql\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"8080\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http-proxy\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"8443\"><state state=\"open\" reason=\"syn-ack\" reason_ttl=\"0\"/><service name=\"https-alt\" product=\"httpd/3.0\" servicefp=\"SF-Port8443-TCP:V=7.80%T=SSL%I=7%D=4/28%Time=69F0903D%P=i686-pc-windows-windows%r(GetRequest,10D,&quot;HTTP/1\\.0\\x20200\\x20OK\\r\\nServer:\\x20httpd/3\\.0\\r\\nx-frame-options:\\x20SAMEORIGIN\\r\\nx-xss-protection:\\x201;\\x20mode=block\\r\\nDate:\\x20Tue,\\x2028\\x20Apr\\x202026\\x2010:47:26\\x20GMT\\r\\nContent-Type:\\x20text/html\\r\\nConnection:\\x20close\\r\\n\\r\\n&lt;HTML&gt;&lt;HEAD&gt;&lt;script&gt;window\\.top\\.location\\.href=&apos;/Main_Login\\.asp&apos;;&lt;/script&gt;\\n&lt;/HEAD&gt;&lt;/HTML&gt;\\n&quot;)%r(HTTPOptions,15C,&quot;HTTP/1\\.0\\x20501\\x20Not\\x20Implemented\\r\\nServer:\\x20httpd/3\\.0\\r\\nx-frame-options:\\x20SAMEORIGIN\\r\\nx-xss-protection:\\x201;\\x20mode=block\\r\\nDate:\\x20Tue,\\x2028\\x20Apr\\x202026\\x2010:47:26\\x20GMT\\r\\nContent-Type:\\x20text/html\\r\\nConnection:\\x20close\\r\\n\\r\\n&lt;HTML&gt;&lt;HEAD&gt;&lt;TITLE&gt;501\\x20Not\\x20Implemented&lt;/TITLE&gt;&lt;/HEAD&gt;\\n&lt;BODY\\x20BGCOLOR=\\&quot;#cc9999\\&quot;&gt;&lt;H4&gt;501\\x20Not\\x20Implemented&lt;/H4&gt;\\nThat\\x20method\\x20is\\x20not\\x20implemented\\.\\n&lt;/BODY&gt;&lt;/HTML&gt;\\n&quot;)%r(FourOhFourRequest,13A,&quot;HTTP/1\\.0\\x20404\\x20Not\\x20Found\\r\\nServer:\\x20httpd/3\\.0\\r\\nx-frame-options:\\x20SAMEORIGIN\\r\\nx-xss-protection:\\x201;\\x20mode=block\\r\\nDate:\\x20Tue,\\x2028\\x20Apr\\x202026\\x2010:47:26\\x20GMT\\r\\nContent-Type:\\x20text/html\\r\\nConnection:\\x20close\\r\\n\\r\\n&lt;HTML&gt;&lt;HEAD&gt;&lt;TITLE&gt;404\\x20Not\\x20Found&lt;/TITLE&gt;&lt;/HEAD&gt;\\n&lt;BODY\\x20BGCOLOR=\\&quot;#cc9999\\&quot;&gt;&lt;H4&gt;404\\x20Not\\x20Found&lt;/H4&gt;\\nFile\\x20not\\x20found\\.\\n&lt;/BODY&gt;&lt;/HTML&gt;\\n&quot;)%r(RTSPRequest,15C,&quot;HTTP/1\\.0\\x20501\\x20Not\\x20Implemented\\r\\nServer:\\x20httpd/3\\.0\\r\\nx-frame-options:\\x20SAMEORIGIN\\r\\nx-xss-protection:\\x201;\\x20mode=block\\r\\nDate:\\x20Tue,\\x2028\\x20Apr\\x202026\\x2010:47:26\\x20GMT\\r\\nContent-Type:\\x20text/html\\r\\nConnection:\\x20close\\r\\n\\r\\n&lt;HTML&gt;&lt;HEAD&gt;&lt;TITLE&gt;501\\x20Not\\x20Implemented&lt;/TITLE&gt;&lt;/HEAD&gt;\\n&lt;BODY\\x20BGCOLOR=\\&quot;#cc9999\\&quot;&gt;&lt;H4&gt;501\\x20Not\\x20Implemented&lt;/H4&gt;\\nThat\\x20method\\x20is\\x20not\\x20implemented\\.\\n&lt;/BODY&gt;&lt;/HTML&gt;\\n&quot;)%r(RPCCheck,145,&quot;HTTP/1\\.0\\x20400\\x20Bad\\x20Request\\r\\nServer:\\x20httpd/3\\.0\\r\\nx-frame-options:\\x20SAMEORIGIN\\r\\nx-xss-protection:\\x201;\\x20mode=block\\r\\nDate:\\x20Tue,\\x2028\\x20Apr\\x202026\\x2010:47:28\\x20GMT\\r\\nContent-Type:\\x20text/html\\r\\nConnection:\\x20close\\r\\n\\r\\n&lt;HTML&gt;&lt;HEAD&gt;&lt;TITLE&gt;400\\x20Bad\\x20Request&lt;/TITLE&gt;&lt;/HEAD&gt;\\n&lt;BODY\\x20BGCOLOR=\\&quot;#cc9999\\&quot;&gt;&lt;H4&gt;400\\x20Bad\\x20Request&lt;/H4&gt;\\nCan&apos;t\\x20parse\\x20request\\.\\n&lt;/BODY&gt;&lt;/HTML&gt;\\n&quot;);\" tunnel=\"ssl\" method=\"probed\" conf=\"10\"/></port>\r\n</ports>\r\n<times srtt=\"1083\" rttvar=\"1748\" to=\"100000\"/>\r\n</host>\r\n<host starttime=\"1777373212\" endtime=\"1777373382\"><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.5\" addrtype=\"ipv4\"/>\r\n<address addr=\"E8:38:A0:86:74:DB\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<ports><port protocol=\"tcp\" portid=\"22\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ssh\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"53\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"domain\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"80\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"135\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"msrpc\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"139\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"netbios-ssn\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"443\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"https\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"445\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"microsoft-ds\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3000\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ppp\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3306\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"mysql\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3389\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ms-wbt-server\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"5432\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"postgresql\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"8080\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http-proxy\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"8443\"><state state=\"open\" reason=\"syn-ack\" reason_ttl=\"0\"/><service name=\"https-alt\" tunnel=\"ssl\" method=\"table\" conf=\"3\"/></port>\r\n</ports>\r\n<times srtt=\"25000\" rttvar=\"27000\" to=\"133000\"/>\r\n</host>\r\n<host starttime=\"1777373212\" endtime=\"1777373232\"><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.10\" addrtype=\"ipv4\"/>\r\n<address addr=\"68:9A:87:13:6F:37\" addrtype=\"mac\" vendor=\"Amazon Technologies\"/>\r\n<hostnames>\r\n</hostnames>\r\n<ports><port protocol=\"tcp\" portid=\"22\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ssh\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"53\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"domain\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"80\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"135\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"msrpc\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"139\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"netbios-ssn\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"443\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"https\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"445\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"microsoft-ds\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3000\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ppp\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3306\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"mysql\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3389\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ms-wbt-server\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"5432\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"postgresql\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"8080\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http-proxy\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"8443\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"https-alt\" method=\"table\" conf=\"3\"/></port>\r\n</ports>\r\n<times srtt=\"13000\" rttvar=\"13000\" to=\"100000\"/>\r\n</host>\r\n<host starttime=\"1777373212\" endtime=\"1777373234\"><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.27\" addrtype=\"ipv4\"/>\r\n<address addr=\"1E:DD:06:44:68:AA\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<ports><port protocol=\"tcp\" portid=\"22\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ssh\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"53\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"domain\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"80\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"135\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"msrpc\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"139\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"netbios-ssn\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"443\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"https\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"445\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"microsoft-ds\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3000\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ppp\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3306\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"mysql\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3389\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ms-wbt-server\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"5432\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"postgresql\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"8080\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http-proxy\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"8443\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"https-alt\" method=\"table\" conf=\"3\"/></port>\r\n</ports>\r\n<times srtt=\"14000\" rttvar=\"14000\" to=\"100000\"/>\r\n</host>\r\n<host starttime=\"1777373212\" endtime=\"1777373383\"><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.30\" addrtype=\"ipv4\"/>\r\n<address addr=\"08:27:A8:06:21:3A\" addrtype=\"mac\"/>\r\n<hostnames>\r\n<hostname name=\"LGwebOSTV\" type=\"PTR\"/>\r\n</hostnames>\r\n<ports><port protocol=\"tcp\" portid=\"22\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ssh\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"53\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"domain\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"80\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"135\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"msrpc\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"139\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"netbios-ssn\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"443\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"https\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"445\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"microsoft-ds\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3000\"><state state=\"open\" reason=\"syn-ack\" reason_ttl=\"0\"/><service name=\"tcpwrapped\" method=\"probed\" conf=\"8\"/></port>\r\n<port protocol=\"tcp\" portid=\"3306\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"mysql\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3389\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ms-wbt-server\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"5432\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"postgresql\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"8080\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http-proxy\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"8443\"><state state=\"open\" reason=\"syn-ack\" reason_ttl=\"0\"/><service name=\"https-alt\" method=\"table\" conf=\"3\"/></port>\r\n</ports>\r\n<times srtt=\"6625\" rttvar=\"4687\" to=\"100000\"/>\r\n</host>\r\n<runstats><finished time=\"1777373384\" timestr=\"Tue Apr 28 06:49:44 2026\" elapsed=\"172.80\" summary=\"Nmap done at Tue Apr 28 06:49:44 2026; 12 IP addresses (11 hosts up) scanned in 172.80 seconds\" exit=\"success\"/><hosts up=\"11\" down=\"1\" total=\"12\"/>\r\n</runstats>\r\n</nmaprun>\r\n",
+    "stderr": "",
+    "parsed": {
+      "hosts": [
+        {
+          "ip": "192.168.50.175",
+          "hostname": "host.docker.internal",
+          "status": "up",
+          "osGuess": "",
+          "ports": [
+            {
+              "port": 135,
+              "protocol": "tcp",
+              "state": "open",
+              "service": "msrpc",
+              "product": "Microsoft Windows RPC",
+              "version": ""
+            },
+            {
+              "port": 139,
+              "protocol": "tcp",
+              "state": "open",
+              "service": "netbios-ssn",
+              "product": "Microsoft Windows netbios-ssn",
+              "version": ""
+            },
+            {
+              "port": 445,
+              "protocol": "tcp",
+              "state": "open",
+              "service": "microsoft-ds",
+              "product": "",
+              "version": ""
+            },
+            {
+              "port": 3000,
+              "protocol": "tcp",
+              "state": "open",
+              "service": "ppp",
+              "product": "",
+              "version": ""
+            }
+          ]
+        },
+        {
+          "ip": "192.168.50.200",
+          "hostname": "DESKTOP-PIQDV2I",
+          "status": "up",
+          "osGuess": "",
+          "ports": [
+            {
+              "port": 135,
+              "protocol": "tcp",
+              "state": "open",
+              "service": "msrpc",
+              "product": "Microsoft Windows RPC",
+              "version": ""
+            },
+            {
+              "port": 139,
+              "protocol": "tcp",
+              "state": "open",
+              "service": "netbios-ssn",
+              "product": "Microsoft Windows netbios-ssn",
+              "version": ""
+            },
+            {
+              "port": 445,
+              "protocol": "tcp",
+              "state": "open",
+              "service": "microsoft-ds",
+              "product": "",
+              "version": ""
+            }
+          ]
+        },
+        {
+          "ip": "192.168.50.199",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.173",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.165",
+          "hostname": "Samsung-Range",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.55",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.1",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": [
+            {
+              "port": 53,
+              "protocol": "tcp",
+              "state": "open",
+              "service": "domain",
+              "product": "",
+              "version": ""
+            },
+            {
+              "port": 8443,
+              "protocol": "tcp",
+              "state": "open",
+              "service": "https-alt",
+              "product": "httpd/3.0",
+              "version": ""
+            }
+          ]
+        },
+        {
+          "ip": "192.168.50.5",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": [
+            {
+              "port": 8443,
+              "protocol": "tcp",
+              "state": "open",
+              "service": "https-alt",
+              "product": "",
+              "version": ""
+            }
+          ]
+        },
+        {
+          "ip": "192.168.50.10",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.27",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.30",
+          "hostname": "LGwebOSTV",
+          "status": "up",
+          "osGuess": "",
+          "ports": [
+            {
+              "port": 3000,
+              "protocol": "tcp",
+              "state": "open",
+              "service": "tcpwrapped",
+              "product": "",
+              "version": ""
+            },
+            {
+              "port": 8443,
+              "protocol": "tcp",
+              "state": "open",
+              "service": "https-alt",
+              "product": "",
+              "version": ""
+            }
+          ]
+        }
+      ],
+      "openPorts": [
+        {
+          "host": "192.168.50.175",
+          "hostname": "host.docker.internal",
+          "port": 135,
+          "protocol": "tcp",
+          "state": "open",
+          "service": "msrpc",
+          "product": "Microsoft Windows RPC",
+          "version": ""
+        },
+        {
+          "host": "192.168.50.175",
+          "hostname": "host.docker.internal",
+          "port": 139,
+          "protocol": "tcp",
+          "state": "open",
+          "service": "netbios-ssn",
+          "product": "Microsoft Windows netbios-ssn",
+          "version": ""
+        },
+        {
+          "host": "192.168.50.175",
+          "hostname": "host.docker.internal",
+          "port": 445,
+          "protocol": "tcp",
+          "state": "open",
+          "service": "microsoft-ds",
+          "product": "",
+          "version": ""
+        },
+        {
+          "host": "192.168.50.175",
+          "hostname": "host.docker.internal",
+          "port": 3000,
+          "protocol": "tcp",
+          "state": "open",
+          "service": "ppp",
+          "product": "",
+          "version": ""
+        },
+        {
+          "host": "192.168.50.200",
+          "hostname": "DESKTOP-PIQDV2I",
+          "port": 135,
+          "protocol": "tcp",
+          "state": "open",
+          "service": "msrpc",
+          "product": "Microsoft Windows RPC",
+          "version": ""
+        },
+        {
+          "host": "192.168.50.200",
+          "hostname": "DESKTOP-PIQDV2I",
+          "port": 139,
+          "protocol": "tcp",
+          "state": "open",
+          "service": "netbios-ssn",
+          "product": "Microsoft Windows netbios-ssn",
+          "version": ""
+        },
+        {
+          "host": "192.168.50.200",
+          "hostname": "DESKTOP-PIQDV2I",
+          "port": 445,
+          "protocol": "tcp",
+          "state": "open",
+          "service": "microsoft-ds",
+          "product": "",
+          "version": ""
+        },
+        {
+          "host": "192.168.50.1",
+          "hostname": "",
+          "port": 53,
+          "protocol": "tcp",
+          "state": "open",
+          "service": "domain",
+          "product": "",
+          "version": ""
+        },
+        {
+          "host": "192.168.50.1",
+          "hostname": "",
+          "port": 8443,
+          "protocol": "tcp",
+          "state": "open",
+          "service": "https-alt",
+          "product": "httpd/3.0",
+          "version": ""
+        },
+        {
+          "host": "192.168.50.5",
+          "hostname": "",
+          "port": 8443,
+          "protocol": "tcp",
+          "state": "open",
+          "service": "https-alt",
+          "product": "",
+          "version": ""
+        },
+        {
+          "host": "192.168.50.30",
+          "hostname": "LGwebOSTV",
+          "port": 3000,
+          "protocol": "tcp",
+          "state": "open",
+          "service": "tcpwrapped",
+          "product": "",
+          "version": ""
+        },
+        {
+          "host": "192.168.50.30",
+          "hostname": "LGwebOSTV",
+          "port": 8443,
+          "protocol": "tcp",
+          "state": "open",
+          "service": "https-alt",
+          "product": "",
+          "version": ""
+        }
+      ],
+      "summary": {
+        "hostsUp": 11,
+        "openPorts": 12
+      }
+    },
+    "findings": [
+      {
+        "severity": "Medium",
+        "title": "SMB service detected",
+        "host": "192.168.50.175",
+        "description": "SMB or Windows file sharing appears to be available.",
+        "recommendation": "Review shares, permissions, guest access, and patch status."
+      },
+      {
+        "severity": "Info",
+        "title": "Web service detected",
+        "host": "192.168.50.175",
+        "description": "A web service was detected on port 3000.",
+        "recommendation": "Review exposed routes, headers, and development-only settings."
+      },
+      {
+        "severity": "Medium",
+        "title": "SMB service detected",
+        "host": "192.168.50.200",
+        "description": "SMB or Windows file sharing appears to be available.",
+        "recommendation": "Review shares, permissions, guest access, and patch status."
+      },
+      {
+        "severity": "Info",
+        "title": "Web service detected",
+        "host": "192.168.50.1",
+        "description": "A web service was detected on port 8443.",
+        "recommendation": "Review exposed routes, headers, and development-only settings."
+      },
+      {
+        "severity": "Info",
+        "title": "Web service detected",
+        "host": "192.168.50.5",
+        "description": "A web service was detected on port 8443.",
+        "recommendation": "Review exposed routes, headers, and development-only settings."
+      },
+      {
+        "severity": "Info",
+        "title": "Web service detected",
+        "host": "192.168.50.30",
+        "description": "A web service was detected on port 3000.",
+        "recommendation": "Review exposed routes, headers, and development-only settings."
+      },
+      {
+        "severity": "Info",
+        "title": "Web service detected",
+        "host": "192.168.50.30",
+        "description": "A web service was detected on port 8443.",
+        "recommendation": "Review exposed routes, headers, and development-only settings."
+      }
+    ],
+    "notes": "Authorized local lab scan"
+  },
+  {
+    "id": "scan-1777372301913",
+    "target": "192.168.50.0/24",
+    "modeId": "quick-discovery",
+    "modeName": "Quick Discovery",
+    "args": [
+      "-sn",
+      "-T3",
+      "-oX",
+      "-",
+      "192.168.50.0/24"
+    ],
+    "safeCommandPreview": "nmap -sn -T3 -oX - 192.168.50.0/24",
+    "status": "completed",
+    "startedAt": "2026-04-28T10:31:34.470Z",
+    "completedAt": "2026-04-28T10:31:41.908Z",
+    "durationMs": 7438,
+    "rawOutput": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<!DOCTYPE nmaprun>\r\n<?xml-stylesheet href=\"file:///C:/Program Files (x86)/Nmap/nmap.xsl\" type=\"text/xsl\"?>\r\n<!-- Nmap 7.80 scan initiated Tue Apr 28 06:31:34 2026 as: &quot;C:\\\\Program Files (x86)\\\\Nmap\\\\nmap.exe&quot; -&#45;stats-every 5s -sn -T3 -oX - 192.168.50.0/24 -->\r\n<nmaprun scanner=\"nmap\" args=\"&quot;C:\\\\Program Files (x86)\\\\Nmap\\\\nmap.exe&quot; -&#45;stats-every 5s -sn -T3 -oX - 192.168.50.0/24\" start=\"1777372294\" startstr=\"Tue Apr 28 06:31:34 2026\" version=\"7.80\" xmloutputversion=\"1.04\">\r\n<verbose level=\"0\"/>\r\n<debugging level=\"0\"/>\r\n<taskprogress task=\"ARP Ping Scan\" time=\"1777372299\" percent=\"57.84\" remaining=\"4\" etc=\"1777372303\"/>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.1\" addrtype=\"ipv4\"/>\r\n<address addr=\"BC:FC:E7:25:37:58\" addrtype=\"mac\"/>\r\n<hostnames>\r\n<hostname name=\"RT-BE82U-3758\" type=\"PTR\"/>\r\n</hostnames>\r\n<times srtt=\"1000\" rttvar=\"5000\" to=\"100000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.5\" addrtype=\"ipv4\"/>\r\n<address addr=\"E8:38:A0:86:74:DB\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"20000\" rttvar=\"20000\" to=\"100000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.10\" addrtype=\"ipv4\"/>\r\n<address addr=\"68:9A:87:13:6F:37\" addrtype=\"mac\" vendor=\"Amazon Technologies\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"12000\" rttvar=\"12000\" to=\"100000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.27\" addrtype=\"ipv4\"/>\r\n<address addr=\"1E:DD:06:44:68:AA\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"79000\" rttvar=\"79000\" to=\"395000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.30\" addrtype=\"ipv4\"/>\r\n<address addr=\"08:27:A8:06:21:3A\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"98250\" rttvar=\"82937\" to=\"429998\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.55\" addrtype=\"ipv4\"/>\r\n<address addr=\"84:C8:A0:CC:03:80\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"80000\" rttvar=\"80000\" to=\"400000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.165\" addrtype=\"ipv4\"/>\r\n<address addr=\"34:FC:99:97:C6:7C\" addrtype=\"mac\"/>\r\n<hostnames>\r\n<hostname name=\"Samsung-Range\" type=\"PTR\"/>\r\n</hostnames>\r\n<times srtt=\"115000\" rttvar=\"115000\" to=\"575000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.173\" addrtype=\"ipv4\"/>\r\n<address addr=\"3C:FA:06:CA:44:45\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"0\" rttvar=\"5000\" to=\"100000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.199\" addrtype=\"ipv4\"/>\r\n<address addr=\"68:DB:F5:2E:D5:8F\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"134000\" rttvar=\"134000\" to=\"670000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.200\" addrtype=\"ipv4\"/>\r\n<address addr=\"00:C0:CA:B6:6E:B2\" addrtype=\"mac\" vendor=\"ALFA\"/>\r\n<hostnames>\r\n<hostname name=\"DESKTOP-PIQDV2I\" type=\"PTR\"/>\r\n</hostnames>\r\n<times srtt=\"93000\" rttvar=\"93000\" to=\"465000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.242\" addrtype=\"ipv4\"/>\r\n<address addr=\"28:D5:B1:CF:8C:1D\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"34000\" rttvar=\"34000\" to=\"170000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"localhost-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.175\" addrtype=\"ipv4\"/>\r\n<hostnames>\r\n<hostname name=\"host.docker.internal\" type=\"PTR\"/>\r\n</hostnames>\r\n</host>\r\n<runstats><finished time=\"1777372301\" timestr=\"Tue Apr 28 06:31:41 2026\" elapsed=\"7.41\" summary=\"Nmap done at Tue Apr 28 06:31:41 2026; 256 IP addresses (12 hosts up) scanned in 7.41 seconds\" exit=\"success\"/><hosts up=\"12\" down=\"244\" total=\"256\"/>\r\n</runstats>\r\n</nmaprun>\r\n",
+    "stderr": "",
+    "parsed": {
+      "hosts": [
+        {
+          "ip": "192.168.50.1",
+          "hostname": "RT-BE82U-3758",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.5",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.10",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.27",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.30",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.55",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.165",
+          "hostname": "Samsung-Range",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.173",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.199",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.200",
+          "hostname": "DESKTOP-PIQDV2I",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.242",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.175",
+          "hostname": "host.docker.internal",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        }
+      ],
+      "openPorts": [],
+      "summary": {
+        "hostsUp": 12,
+        "openPorts": 0
+      }
+    },
+    "findings": [],
+    "notes": "Authorized local lab scan"
+  },
+  {
+    "id": "scan-1777371051802",
+    "target": "127.0.0.1",
+    "modeId": "full-tcp",
+    "modeName": "Full TCP Scan",
+    "args": [
+      "-sT",
+      "-p",
+      "22,80,135,139,443,445,3000,3306,5432,3389",
+      "-T3",
+      "-oX",
+      "-",
+      "127.0.0.1"
+    ],
+    "safeCommandPreview": "nmap -sT -p 22,80,135,139,443,445,3000,3306,5432,3389 -T3 -oX - 127.0.0.1",
+    "status": "completed",
+    "startedAt": "2026-04-28T10:10:49.996Z",
+    "completedAt": "2026-04-28T10:10:51.794Z",
+    "durationMs": 1798,
+    "rawOutput": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<!DOCTYPE nmaprun>\r\n<?xml-stylesheet href=\"file:///C:/Program Files (x86)/Nmap/nmap.xsl\" type=\"text/xsl\"?>\r\n<!-- Nmap 7.80 scan initiated Tue Apr 28 06:10:50 2026 as: &quot;C:\\\\Program Files (x86)\\\\Nmap\\\\nmap.exe&quot; -&#45;stats-every 5s -sT -p 22,80,135,139,443,445,3000,3306,5432,3389 -T3 -oX - 127.0.0.1 -->\r\n<nmaprun scanner=\"nmap\" args=\"&quot;C:\\\\Program Files (x86)\\\\Nmap\\\\nmap.exe&quot; -&#45;stats-every 5s -sT -p 22,80,135,139,443,445,3000,3306,5432,3389 -T3 -oX - 127.0.0.1\" start=\"1777371050\" startstr=\"Tue Apr 28 06:10:50 2026\" version=\"7.80\" xmloutputversion=\"1.04\">\r\n<scaninfo type=\"connect\" protocol=\"tcp\" numservices=\"10\" services=\"22,80,135,139,443,445,3000,3306,3389,5432\"/>\r\n<verbose level=\"0\"/>\r\n<debugging level=\"0\"/>\r\n<host starttime=\"1777371050\" endtime=\"1777371051\"><status state=\"up\" reason=\"localhost-response\" reason_ttl=\"0\"/>\r\n<address addr=\"127.0.0.1\" addrtype=\"ipv4\"/>\r\n<hostnames>\r\n<hostname name=\"checkhost.local\" type=\"PTR\"/>\r\n</hostnames>\r\n<ports><port protocol=\"tcp\" portid=\"22\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ssh\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"80\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"135\"><state state=\"open\" reason=\"syn-ack\" reason_ttl=\"0\"/><service name=\"msrpc\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"139\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"netbios-ssn\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"443\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"https\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"445\"><state state=\"open\" reason=\"syn-ack\" reason_ttl=\"0\"/><service name=\"microsoft-ds\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3000\"><state state=\"open\" reason=\"syn-ack\" reason_ttl=\"0\"/><service name=\"ppp\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3306\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"mysql\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3389\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ms-wbt-server\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"5432\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"postgresql\" method=\"table\" conf=\"3\"/></port>\r\n</ports>\r\n<times srtt=\"765\" rttvar=\"3218\" to=\"100000\"/>\r\n</host>\r\n<runstats><finished time=\"1777371051\" timestr=\"Tue Apr 28 06:10:51 2026\" elapsed=\"1.77\" summary=\"Nmap done at Tue Apr 28 06:10:51 2026; 1 IP address (1 host up) scanned in 1.77 seconds\" exit=\"success\"/><hosts up=\"1\" down=\"0\" total=\"1\"/>\r\n</runstats>\r\n</nmaprun>\r\n",
+    "stderr": "",
+    "parsed": {
+      "hosts": [
+        {
+          "ip": "127.0.0.1",
+          "hostname": "checkhost.local",
+          "status": "up",
+          "osGuess": "",
+          "ports": [
+            {
+              "port": 135,
+              "protocol": "tcp",
+              "state": "open",
+              "service": "msrpc",
+              "product": "",
+              "version": ""
+            },
+            {
+              "port": 445,
+              "protocol": "tcp",
+              "state": "open",
+              "service": "microsoft-ds",
+              "product": "",
+              "version": ""
+            },
+            {
+              "port": 3000,
+              "protocol": "tcp",
+              "state": "open",
+              "service": "ppp",
+              "product": "",
+              "version": ""
+            }
+          ]
+        }
+      ],
+      "openPorts": [
+        {
+          "host": "127.0.0.1",
+          "hostname": "checkhost.local",
+          "port": 135,
+          "protocol": "tcp",
+          "state": "open",
+          "service": "msrpc",
+          "product": "",
+          "version": ""
+        },
+        {
+          "host": "127.0.0.1",
+          "hostname": "checkhost.local",
+          "port": 445,
+          "protocol": "tcp",
+          "state": "open",
+          "service": "microsoft-ds",
+          "product": "",
+          "version": ""
+        },
+        {
+          "host": "127.0.0.1",
+          "hostname": "checkhost.local",
+          "port": 3000,
+          "protocol": "tcp",
+          "state": "open",
+          "service": "ppp",
+          "product": "",
+          "version": ""
+        }
+      ],
+      "summary": {
+        "hostsUp": 1,
+        "openPorts": 3
+      }
+    },
+    "findings": [
+      {
+        "severity": "Medium",
+        "title": "SMB service detected",
+        "host": "127.0.0.1",
+        "description": "SMB or Windows file sharing appears to be available.",
+        "recommendation": "Review shares, permissions, guest access, and patch status."
+      },
+      {
+        "severity": "Info",
+        "title": "Web service detected",
+        "host": "127.0.0.1",
+        "description": "A web service was detected on port 3000.",
+        "recommendation": "Review exposed routes, headers, and development-only settings."
+      }
+    ],
+    "notes": "Authorized local lab scan"
+  },
+  {
+    "id": "scan-1777371025496",
+    "target": "127.0.0.1",
+    "modeId": "service-detection",
+    "modeName": "Service Detection",
+    "args": [
+      "-sT",
+      "-sV",
+      "-p",
+      "22,80,135,139,443,445,3000,3306,5432,3389",
+      "-T3",
+      "-oX",
+      "-",
+      "127.0.0.1"
+    ],
+    "safeCommandPreview": "nmap -sT -sV -p 22,80,135,139,443,445,3000,3306,5432,3389 -T3 -oX - 127.0.0.1",
+    "status": "completed",
+    "startedAt": "2026-04-28T10:10:10.054Z",
+    "completedAt": "2026-04-28T10:10:25.492Z",
+    "durationMs": 15438,
+    "rawOutput": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<!DOCTYPE nmaprun>\r\n<?xml-stylesheet href=\"file:///C:/Program Files (x86)/Nmap/nmap.xsl\" type=\"text/xsl\"?>\r\n<!-- Nmap 7.80 scan initiated Tue Apr 28 06:10:10 2026 as: &quot;C:\\\\Program Files (x86)\\\\Nmap\\\\nmap.exe&quot; -&#45;stats-every 5s -sT -sV -p 22,80,135,139,443,445,3000,3306,5432,3389 -T3 -oX - 127.0.0.1 -->\r\n<nmaprun scanner=\"nmap\" args=\"&quot;C:\\\\Program Files (x86)\\\\Nmap\\\\nmap.exe&quot; -&#45;stats-every 5s -sT -sV -p 22,80,135,139,443,445,3000,3306,5432,3389 -T3 -oX - 127.0.0.1\" start=\"1777371010\" startstr=\"Tue Apr 28 06:10:10 2026\" version=\"7.80\" xmloutputversion=\"1.04\">\r\n<scaninfo type=\"connect\" protocol=\"tcp\" numservices=\"10\" services=\"22,80,135,139,443,445,3000,3306,3389,5432\"/>\r\n<verbose level=\"0\"/>\r\n<debugging level=\"0\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777371018\" percent=\"0.00\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777371023\" percent=\"66.67\" remaining=\"6\" etc=\"1777371029\"/>\r\n<taskprogress task=\"Service scan\" time=\"1777371025\" percent=\"66.67\" remaining=\"7\" etc=\"1777371032\"/>\r\n<host starttime=\"1777371011\" endtime=\"1777371025\"><status state=\"up\" reason=\"localhost-response\" reason_ttl=\"0\"/>\r\n<address addr=\"127.0.0.1\" addrtype=\"ipv4\"/>\r\n<hostnames>\r\n<hostname name=\"checkhost.local\" type=\"PTR\"/>\r\n</hostnames>\r\n<ports><port protocol=\"tcp\" portid=\"22\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ssh\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"80\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"135\"><state state=\"open\" reason=\"syn-ack\" reason_ttl=\"0\"/><service name=\"msrpc\" product=\"Microsoft Windows RPC\" ostype=\"Windows\" method=\"probed\" conf=\"10\"><cpe>cpe:/o:microsoft:windows</cpe></service></port>\r\n<port protocol=\"tcp\" portid=\"139\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"netbios-ssn\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"443\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"https\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"445\"><state state=\"open\" reason=\"syn-ack\" reason_ttl=\"0\"/><service name=\"microsoft-ds\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3000\"><state state=\"open\" reason=\"syn-ack\" reason_ttl=\"0\"/><service name=\"ppp\" servicefp=\"SF-Port3000-TCP:V=7.80%I=7%D=4/28%Time=69F08790%P=i686-pc-windows-windows%r(GetRequest,2AF6,&quot;HTTP/1\\.1\\x20200\\x20OK\\r\\nVary:\\x20rsc,\\x20next-router-state-tree,\\x20next-router-prefetch,\\x20next-router-segment-prefetch,\\x20Accept-Encoding\\r\\nCache-Control:\\x20no-cache,\\x20must-revalidate\\r\\nX-Powered-By:\\x20Next\\.js\\r\\nContent-Type:\\x20text/html;\\x20charset=utf-8\\r\\nDate:\\x20Tue,\\x2028\\x20Apr\\x202026\\x2010:10:24\\x20GMT\\r\\nConnection:\\x20close\\r\\n\\r\\n&lt;!DOCTYPE\\x20html&gt;&lt;html\\x20lang=\\&quot;en\\&quot;&gt;&lt;head&gt;&lt;meta\\x20charSet=\\&quot;utf-8\\&quot;/&gt;&lt;meta\\x20name=\\&quot;viewport\\&quot;\\x20content=\\&quot;width=device-width,\\x20initial-scale=1\\&quot;/&gt;&lt;link\\x20rel=\\&quot;stylesheet\\&quot;\\x20href=\\&quot;/_next/static/css/app/layout\\.css\\?v=1777371023995\\&quot;\\x20data-precedence=\\&quot;next_static/css/app/layout\\.css\\&quot;/&gt;&lt;link\\x20rel=\\&quot;preload\\&quot;\\x20as=\\&quot;script\\&quot;\\x20fetchPriority=\\&quot;low\\&quot;\\x20href=\\&quot;/_next/static/chunks/webpack\\.js\\?v=1777371023995\\&quot;/&gt;&lt;script\\x20src=\\&quot;/_next/static/chunks/main-app\\.js\\?v=1777371023995\\&quot;\\x20async=\\&quot;\\&quot;&gt;&lt;/script&gt;&lt;script\\x20src=\\&quot;/_next/static/chunks/app-pages-internals\\.js\\&quot;\\x20async=\\&quot;\\&quot;&gt;&lt;/script&gt;&lt;script\\x20src=\\&quot;/_next/static/chunks/app/page\\.js\\&quot;\\x20async=\\&quot;\\&quot;&gt;&lt;/script&gt;&lt;title&gt;SyferSec\\x20Lab\\x20Console&lt;&quot;)%r(Help,2F,&quot;HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nConnection:\\x20close\\r\\n\\r\\n&quot;)%r(NCP,2F,&quot;HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nConnection:\\x20close\\r\\n\\r\\n&quot;)%r(HTTPOptions,AB,&quot;HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nvary:\\x20rsc,\\x20next-router-state-tree,\\x20next-router-prefetch,\\x20next-router-segment-prefetch\\r\\nDate:\\x20Tue,\\x2028\\x20Apr\\x202026\\x2010:10:24\\x20GMT\\r\\nConnection:\\x20close\\r\\n\\r\\n&quot;)%r(RTSPRequest,AB,&quot;HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nvary:\\x20rsc,\\x20next-router-state-tree,\\x20next-router-prefetch,\\x20next-router-segment-prefetch\\r\\nDate:\\x20Tue,\\x2028\\x20Apr\\x202026\\x2010:10:24\\x20GMT\\r\\nConnection:\\x20close\\r\\n\\r\\n&quot;)%r(RPCCheck,2F,&quot;HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nConnection:\\x20close\\r\\n\\r\\n&quot;)%r(DNSVersionBindReqTCP,2F,&quot;HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nConnection:\\x20close\\r\\n\\r\\n&quot;)%r(DNSStatusRequestTCP,2F,&quot;HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nConnection:\\x20close\\r\\n\\r\\n&quot;);\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3306\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"mysql\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3389\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ms-wbt-server\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"5432\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"postgresql\" method=\"table\" conf=\"3\"/></port>\r\n</ports>\r\n<times srtt=\"109\" rttvar=\"3031\" to=\"100000\"/>\r\n</host>\r\n<runstats><finished time=\"1777371025\" timestr=\"Tue Apr 28 06:10:25 2026\" elapsed=\"15.40\" summary=\"Nmap done at Tue Apr 28 06:10:25 2026; 1 IP address (1 host up) scanned in 15.40 seconds\" exit=\"success\"/><hosts up=\"1\" down=\"0\" total=\"1\"/>\r\n</runstats>\r\n</nmaprun>\r\n",
+    "stderr": "",
+    "parsed": {
+      "hosts": [
+        {
+          "ip": "127.0.0.1",
+          "hostname": "checkhost.local",
+          "status": "up",
+          "osGuess": "",
+          "ports": [
+            {
+              "port": 135,
+              "protocol": "tcp",
+              "state": "open",
+              "service": "msrpc",
+              "product": "Microsoft Windows RPC",
+              "version": ""
+            },
+            {
+              "port": 445,
+              "protocol": "tcp",
+              "state": "open",
+              "service": "microsoft-ds",
+              "product": "",
+              "version": ""
+            },
+            {
+              "port": 3000,
+              "protocol": "tcp",
+              "state": "open",
+              "service": "ppp",
+              "product": "",
+              "version": ""
+            }
+          ]
+        }
+      ],
+      "openPorts": [
+        {
+          "host": "127.0.0.1",
+          "hostname": "checkhost.local",
+          "port": 135,
+          "protocol": "tcp",
+          "state": "open",
+          "service": "msrpc",
+          "product": "Microsoft Windows RPC",
+          "version": ""
+        },
+        {
+          "host": "127.0.0.1",
+          "hostname": "checkhost.local",
+          "port": 445,
+          "protocol": "tcp",
+          "state": "open",
+          "service": "microsoft-ds",
+          "product": "",
+          "version": ""
+        },
+        {
+          "host": "127.0.0.1",
+          "hostname": "checkhost.local",
+          "port": 3000,
+          "protocol": "tcp",
+          "state": "open",
+          "service": "ppp",
+          "product": "",
+          "version": ""
+        }
+      ],
+      "summary": {
+        "hostsUp": 1,
+        "openPorts": 3
+      }
+    },
+    "findings": [
+      {
+        "severity": "Medium",
+        "title": "SMB service detected",
+        "host": "127.0.0.1",
+        "description": "SMB or Windows file sharing appears to be available.",
+        "recommendation": "Review shares, permissions, guest access, and patch status."
+      },
+      {
+        "severity": "Info",
+        "title": "Web service detected",
+        "host": "127.0.0.1",
+        "description": "A web service was detected on port 3000.",
+        "recommendation": "Review exposed routes, headers, and development-only settings."
+      }
+    ],
+    "notes": "Authorized local lab scan"
+  },
+  {
+    "id": "scan-1777321139472",
+    "target": "127.0.0.1",
+    "modeId": "service-detection",
+    "modeName": "Service Detection",
+    "args": [
+      "-sT",
+      "-sV",
+      "-p",
+      "22,80,135,139,443,445,3000,3306,5432,3389",
+      "-T3",
+      "-oX",
+      "-",
+      "127.0.0.1"
+    ],
+    "safeCommandPreview": "nmap -sT -sV -p 22,80,135,139,443,445,3000,3306,5432,3389 -T3 -oX - 127.0.0.1",
+    "status": "completed",
+    "startedAt": "2026-04-27T20:18:45.205Z",
+    "completedAt": "2026-04-27T20:18:59.470Z",
+    "durationMs": 14265,
+    "rawOutput": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<!DOCTYPE nmaprun>\r\n<?xml-stylesheet href=\"file:///C:/Program Files (x86)/Nmap/nmap.xsl\" type=\"text/xsl\"?>\r\n<!-- Nmap 7.80 scan initiated Mon Apr 27 16:18:45 2026 as: &quot;C:\\\\Program Files (x86)\\\\Nmap\\\\nmap.exe&quot; -sT -sV -p 22,80,135,139,443,445,3000,3306,5432,3389 -T3 -oX - 127.0.0.1 -->\r\n<nmaprun scanner=\"nmap\" args=\"&quot;C:\\\\Program Files (x86)\\\\Nmap\\\\nmap.exe&quot; -sT -sV -p 22,80,135,139,443,445,3000,3306,5432,3389 -T3 -oX - 127.0.0.1\" start=\"1777321125\" startstr=\"Mon Apr 27 16:18:45 2026\" version=\"7.80\" xmloutputversion=\"1.04\">\r\n<scaninfo type=\"connect\" protocol=\"tcp\" numservices=\"10\" services=\"22,80,135,139,443,445,3000,3306,3389,5432\"/>\r\n<verbose level=\"0\"/>\r\n<debugging level=\"0\"/>\r\n<host starttime=\"1777321126\" endtime=\"1777321139\"><status state=\"up\" reason=\"localhost-response\" reason_ttl=\"0\"/>\r\n<address addr=\"127.0.0.1\" addrtype=\"ipv4\"/>\r\n<hostnames>\r\n<hostname name=\"checkhost.local\" type=\"PTR\"/>\r\n</hostnames>\r\n<ports><port protocol=\"tcp\" portid=\"22\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ssh\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"80\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"135\"><state state=\"open\" reason=\"syn-ack\" reason_ttl=\"0\"/><service name=\"msrpc\" product=\"Microsoft Windows RPC\" ostype=\"Windows\" method=\"probed\" conf=\"10\"><cpe>cpe:/o:microsoft:windows</cpe></service></port>\r\n<port protocol=\"tcp\" portid=\"139\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"netbios-ssn\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"443\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"https\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"445\"><state state=\"open\" reason=\"syn-ack\" reason_ttl=\"0\"/><service name=\"microsoft-ds\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3000\"><state state=\"open\" reason=\"syn-ack\" reason_ttl=\"0\"/><service name=\"ppp\" servicefp=\"SF-Port3000-TCP:V=7.80%I=7%D=4/27%Time=69EFC4B3%P=i686-pc-windows-windows%r(GetRequest,468E,&quot;HTTP/1\\.1\\x20200\\x20OK\\r\\nVary:\\x20rsc,\\x20next-router-state-tree,\\x20next-router-prefetch,\\x20next-router-segment-prefetch,\\x20Accept-Encoding\\r\\nCache-Control:\\x20no-cache,\\x20must-revalidate\\r\\nX-Powered-By:\\x20Next\\.js\\r\\nContent-Type:\\x20text/html;\\x20charset=utf-8\\r\\nDate:\\x20Mon,\\x2027\\x20Apr\\x202026\\x2020:18:59\\x20GMT\\r\\nConnection:\\x20close\\r\\n\\r\\n&lt;!DOCTYPE\\x20html&gt;&lt;html\\x20lang=\\&quot;en\\&quot;&gt;&lt;head&gt;&lt;meta\\x20charSet=\\&quot;utf-8\\&quot;/&gt;&lt;meta\\x20name=\\&quot;viewport\\&quot;\\x20content=\\&quot;width=device-width,\\x20initial-scale=1\\&quot;/&gt;&lt;link\\x20rel=\\&quot;stylesheet\\&quot;\\x20href=\\&quot;/_next/static/css/app/layout\\.css\\?v=1777321139016\\&quot;\\x20data-precedence=\\&quot;next_static/css/app/layout\\.css\\&quot;/&gt;&lt;link\\x20rel=\\&quot;preload\\&quot;\\x20as=\\&quot;script\\&quot;\\x20fetchPriority=\\&quot;low\\&quot;\\x20href=\\&quot;/_next/static/chunks/webpack\\.js\\?v=1777321139016\\&quot;/&gt;&lt;script\\x20src=\\&quot;/_next/static/chunks/main-app\\.js\\?v=1777321139016\\&quot;\\x20async=\\&quot;\\&quot;&gt;&lt;/script&gt;&lt;script\\x20src=\\&quot;/_next/static/chunks/app-pages-internals\\.js\\&quot;\\x20async=\\&quot;\\&quot;&gt;&lt;/script&gt;&lt;script\\x20src=\\&quot;/_next/static/chunks/app/page\\.js\\&quot;\\x20async=\\&quot;\\&quot;&gt;&lt;/script&gt;&lt;title&gt;SyferSec\\x20Lab\\x20Console&lt;&quot;)%r(Help,2F,&quot;HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nConnection:\\x20close\\r\\n\\r\\n&quot;)%r(NCP,2F,&quot;HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nConnection:\\x20close\\r\\n\\r\\n&quot;)%r(HTTPOptions,AB,&quot;HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nvary:\\x20rsc,\\x20next-router-state-tree,\\x20next-router-prefetch,\\x20next-router-segment-prefetch\\r\\nDate:\\x20Mon,\\x2027\\x20Apr\\x202026\\x2020:18:59\\x20GMT\\r\\nConnection:\\x20close\\r\\n\\r\\n&quot;)%r(RTSPRequest,AB,&quot;HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nvary:\\x20rsc,\\x20next-router-state-tree,\\x20next-router-prefetch,\\x20next-router-segment-prefetch\\r\\nDate:\\x20Mon,\\x2027\\x20Apr\\x202026\\x2020:18:59\\x20GMT\\r\\nConnection:\\x20close\\r\\n\\r\\n&quot;)%r(RPCCheck,2F,&quot;HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nConnection:\\x20close\\r\\n\\r\\n&quot;)%r(DNSVersionBindReqTCP,2F,&quot;HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nConnection:\\x20close\\r\\n\\r\\n&quot;)%r(DNSStatusRequestTCP,2F,&quot;HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nConnection:\\x20close\\r\\n\\r\\n&quot;);\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3306\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"mysql\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3389\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ms-wbt-server\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"5432\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"postgresql\" method=\"table\" conf=\"3\"/></port>\r\n</ports>\r\n<times srtt=\"0\" rttvar=\"2812\" to=\"100000\"/>\r\n</host>\r\n<runstats><finished time=\"1777321139\" timestr=\"Mon Apr 27 16:18:59 2026\" elapsed=\"14.24\" summary=\"Nmap done at Mon Apr 27 16:18:59 2026; 1 IP address (1 host up) scanned in 14.24 seconds\" exit=\"success\"/><hosts up=\"1\" down=\"0\" total=\"1\"/>\r\n</runstats>\r\n</nmaprun>\r\n",
+    "stderr": "",
+    "parsed": {
+      "hosts": [
+        {
+          "ip": "127.0.0.1",
+          "hostname": "checkhost.local",
+          "status": "up",
+          "osGuess": "",
+          "ports": [
+            {
+              "port": 135,
+              "protocol": "tcp",
+              "state": "open",
+              "service": "msrpc",
+              "product": "Microsoft Windows RPC",
+              "version": ""
+            },
+            {
+              "port": 445,
+              "protocol": "tcp",
+              "state": "open",
+              "service": "microsoft-ds",
+              "product": "",
+              "version": ""
+            },
+            {
+              "port": 3000,
+              "protocol": "tcp",
+              "state": "open",
+              "service": "ppp",
+              "product": "",
+              "version": ""
+            }
+          ]
+        }
+      ],
+      "openPorts": [
+        {
+          "host": "127.0.0.1",
+          "hostname": "checkhost.local",
+          "port": 135,
+          "protocol": "tcp",
+          "state": "open",
+          "service": "msrpc",
+          "product": "Microsoft Windows RPC",
+          "version": ""
+        },
+        {
+          "host": "127.0.0.1",
+          "hostname": "checkhost.local",
+          "port": 445,
+          "protocol": "tcp",
+          "state": "open",
+          "service": "microsoft-ds",
+          "product": "",
+          "version": ""
+        },
+        {
+          "host": "127.0.0.1",
+          "hostname": "checkhost.local",
+          "port": 3000,
+          "protocol": "tcp",
+          "state": "open",
+          "service": "ppp",
+          "product": "",
+          "version": ""
+        }
+      ],
+      "summary": {
+        "hostsUp": 1,
+        "openPorts": 3
+      }
+    },
+    "findings": [
+      {
+        "severity": "Medium",
+        "title": "SMB service detected",
+        "host": "127.0.0.1",
+        "description": "SMB or Windows file sharing appears to be available.",
+        "recommendation": "Review shares, permissions, guest access, and patch status."
+      },
+      {
+        "severity": "Info",
+        "title": "Web service detected",
+        "host": "127.0.0.1",
+        "description": "A web service was detected on port 3000.",
+        "recommendation": "Review exposed routes, headers, and development-only settings."
+      }
+    ],
+    "notes": "Authorized local lab scan"
+  },
+  {
+    "id": "scan-1777321113830",
+    "target": "127.0.0.1",
+    "modeId": "full-tcp",
+    "modeName": "Full TCP Scan",
+    "args": [
+      "-sT",
+      "-p",
+      "22,80,135,139,443,445,3000,3306,5432,3389",
+      "-T3",
+      "-oX",
+      "-",
+      "127.0.0.1"
+    ],
+    "safeCommandPreview": "nmap -sT -p 22,80,135,139,443,445,3000,3306,5432,3389 -T3 -oX - 127.0.0.1",
+    "status": "completed",
+    "startedAt": "2026-04-27T20:18:32.039Z",
+    "completedAt": "2026-04-27T20:18:33.828Z",
+    "durationMs": 1789,
+    "rawOutput": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<!DOCTYPE nmaprun>\r\n<?xml-stylesheet href=\"file:///C:/Program Files (x86)/Nmap/nmap.xsl\" type=\"text/xsl\"?>\r\n<!-- Nmap 7.80 scan initiated Mon Apr 27 16:18:32 2026 as: &quot;C:\\\\Program Files (x86)\\\\Nmap\\\\nmap.exe&quot; -sT -p 22,80,135,139,443,445,3000,3306,5432,3389 -T3 -oX - 127.0.0.1 -->\r\n<nmaprun scanner=\"nmap\" args=\"&quot;C:\\\\Program Files (x86)\\\\Nmap\\\\nmap.exe&quot; -sT -p 22,80,135,139,443,445,3000,3306,5432,3389 -T3 -oX - 127.0.0.1\" start=\"1777321112\" startstr=\"Mon Apr 27 16:18:32 2026\" version=\"7.80\" xmloutputversion=\"1.04\">\r\n<scaninfo type=\"connect\" protocol=\"tcp\" numservices=\"10\" services=\"22,80,135,139,443,445,3000,3306,3389,5432\"/>\r\n<verbose level=\"0\"/>\r\n<debugging level=\"0\"/>\r\n<host starttime=\"1777321112\" endtime=\"1777321113\"><status state=\"up\" reason=\"localhost-response\" reason_ttl=\"0\"/>\r\n<address addr=\"127.0.0.1\" addrtype=\"ipv4\"/>\r\n<hostnames>\r\n<hostname name=\"checkhost.local\" type=\"PTR\"/>\r\n</hostnames>\r\n<ports><port protocol=\"tcp\" portid=\"22\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ssh\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"80\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"135\"><state state=\"open\" reason=\"syn-ack\" reason_ttl=\"0\"/><service name=\"msrpc\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"139\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"netbios-ssn\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"443\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"https\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"445\"><state state=\"open\" reason=\"syn-ack\" reason_ttl=\"0\"/><service name=\"microsoft-ds\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3000\"><state state=\"open\" reason=\"syn-ack\" reason_ttl=\"0\"/><service name=\"ppp\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3306\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"mysql\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3389\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ms-wbt-server\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"5432\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"postgresql\" method=\"table\" conf=\"3\"/></port>\r\n</ports>\r\n<times srtt=\"234\" rttvar=\"3218\" to=\"100000\"/>\r\n</host>\r\n<runstats><finished time=\"1777321113\" timestr=\"Mon Apr 27 16:18:33 2026\" elapsed=\"1.77\" summary=\"Nmap done at Mon Apr 27 16:18:33 2026; 1 IP address (1 host up) scanned in 1.77 seconds\" exit=\"success\"/><hosts up=\"1\" down=\"0\" total=\"1\"/>\r\n</runstats>\r\n</nmaprun>\r\n",
+    "stderr": "",
+    "parsed": {
+      "hosts": [
+        {
+          "ip": "127.0.0.1",
+          "hostname": "checkhost.local",
+          "status": "up",
+          "osGuess": "",
+          "ports": [
+            {
+              "port": 135,
+              "protocol": "tcp",
+              "state": "open",
+              "service": "msrpc",
+              "product": "",
+              "version": ""
+            },
+            {
+              "port": 445,
+              "protocol": "tcp",
+              "state": "open",
+              "service": "microsoft-ds",
+              "product": "",
+              "version": ""
+            },
+            {
+              "port": 3000,
+              "protocol": "tcp",
+              "state": "open",
+              "service": "ppp",
+              "product": "",
+              "version": ""
+            }
+          ]
+        }
+      ],
+      "openPorts": [
+        {
+          "host": "127.0.0.1",
+          "hostname": "checkhost.local",
+          "port": 135,
+          "protocol": "tcp",
+          "state": "open",
+          "service": "msrpc",
+          "product": "",
+          "version": ""
+        },
+        {
+          "host": "127.0.0.1",
+          "hostname": "checkhost.local",
+          "port": 445,
+          "protocol": "tcp",
+          "state": "open",
+          "service": "microsoft-ds",
+          "product": "",
+          "version": ""
+        },
+        {
+          "host": "127.0.0.1",
+          "hostname": "checkhost.local",
+          "port": 3000,
+          "protocol": "tcp",
+          "state": "open",
+          "service": "ppp",
+          "product": "",
+          "version": ""
+        }
+      ],
+      "summary": {
+        "hostsUp": 1,
+        "openPorts": 3
+      }
+    },
+    "findings": [
+      {
+        "severity": "Medium",
+        "title": "SMB service detected",
+        "host": "127.0.0.1",
+        "description": "SMB or Windows file sharing appears to be available.",
+        "recommendation": "Review shares, permissions, guest access, and patch status."
+      },
+      {
+        "severity": "Info",
+        "title": "Web service detected",
+        "host": "127.0.0.1",
+        "description": "A web service was detected on port 3000.",
+        "recommendation": "Review exposed routes, headers, and development-only settings."
+      }
+    ],
+    "notes": "Authorized local lab scan"
+  },
+  {
+    "id": "scan-1777320743474",
+    "target": "127.0.0.1",
+    "modeId": "basic-tcp",
+    "modeName": "Basic TCP Scan",
+    "args": [
+      "-sT",
+      "-p",
+      "22,80,443,3389",
+      "-T3",
+      "-oX",
+      "-",
+      "127.0.0.1"
+    ],
+    "safeCommandPreview": "nmap -sT -p 22,80,443,3389 -T3 -oX - 127.0.0.1",
+    "status": "completed",
+    "startedAt": "2026-04-27T20:12:20.114Z",
+    "completedAt": "2026-04-27T20:12:23.470Z",
+    "durationMs": 3356,
+    "rawOutput": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<!DOCTYPE nmaprun>\r\n<?xml-stylesheet href=\"file:///C:/Program Files (x86)/Nmap/nmap.xsl\" type=\"text/xsl\"?>\r\n<!-- Nmap 7.80 scan initiated Mon Apr 27 16:12:20 2026 as: &quot;C:\\\\Program Files (x86)\\\\Nmap\\\\nmap.exe&quot; -sT -p 22,80,443,3389 -T3 -oX - 127.0.0.1 -->\r\n<nmaprun scanner=\"nmap\" args=\"&quot;C:\\\\Program Files (x86)\\\\Nmap\\\\nmap.exe&quot; -sT -p 22,80,443,3389 -T3 -oX - 127.0.0.1\" start=\"1777320740\" startstr=\"Mon Apr 27 16:12:20 2026\" version=\"7.80\" xmloutputversion=\"1.04\">\r\n<scaninfo type=\"connect\" protocol=\"tcp\" numservices=\"4\" services=\"22,80,443,3389\"/>\r\n<verbose level=\"0\"/>\r\n<debugging level=\"0\"/>\r\n<host starttime=\"1777320740\" endtime=\"1777320743\"><status state=\"up\" reason=\"localhost-response\" reason_ttl=\"0\"/>\r\n<address addr=\"127.0.0.1\" addrtype=\"ipv4\"/>\r\n<hostnames>\r\n<hostname name=\"checkhost.local\" type=\"PTR\"/>\r\n</hostnames>\r\n<ports><port protocol=\"tcp\" portid=\"22\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ssh\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"80\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"443\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"https\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3389\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ms-wbt-server\" method=\"table\" conf=\"3\"/></port>\r\n</ports>\r\n</host>\r\n<runstats><finished time=\"1777320743\" timestr=\"Mon Apr 27 16:12:23 2026\" elapsed=\"3.33\" summary=\"Nmap done at Mon Apr 27 16:12:23 2026; 1 IP address (1 host up) scanned in 3.33 seconds\" exit=\"success\"/><hosts up=\"1\" down=\"0\" total=\"1\"/>\r\n</runstats>\r\n</nmaprun>\r\n",
+    "stderr": "",
+    "parsed": {
+      "hosts": [
+        {
+          "ip": "127.0.0.1",
+          "hostname": "checkhost.local",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        }
+      ],
+      "openPorts": [],
+      "summary": {
+        "hostsUp": 1,
+        "openPorts": 0
+      }
+    },
+    "findings": [],
+    "notes": "Authorized local lab scan"
+  },
+  {
+    "id": "scan-1777320143069",
+    "target": "192.168.50.0/24",
+    "modeId": "quick-discovery",
+    "modeName": "Quick Discovery",
+    "args": [
+      "-sn",
+      "-sV",
+      "-T3",
+      "-oX",
+      "-",
+      "192.168.50.0/24"
+    ],
+    "safeCommandPreview": "nmap -sn -sV -T3 -oX - 192.168.50.0/24",
+    "status": "completed",
+    "startedAt": "2026-04-27T20:02:16.422Z",
+    "completedAt": "2026-04-27T20:02:23.068Z",
+    "durationMs": 6646,
+    "rawOutput": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<!DOCTYPE nmaprun>\r\n<?xml-stylesheet href=\"file:///C:/Program Files (x86)/Nmap/nmap.xsl\" type=\"text/xsl\"?>\r\n<!-- Nmap 7.80 scan initiated Mon Apr 27 16:02:16 2026 as: &quot;C:\\\\Program Files (x86)\\\\Nmap\\\\nmap.exe&quot; -sn -sV -T3 -oX - 192.168.50.0/24 -->\r\n<nmaprun scanner=\"nmap\" args=\"&quot;C:\\\\Program Files (x86)\\\\Nmap\\\\nmap.exe&quot; -sn -sV -T3 -oX - 192.168.50.0/24\" start=\"1777320136\" startstr=\"Mon Apr 27 16:02:16 2026\" version=\"7.80\" xmloutputversion=\"1.04\">\r\n<verbose level=\"0\"/>\r\n<debugging level=\"0\"/>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.1\" addrtype=\"ipv4\"/>\r\n<address addr=\"BC:FC:E7:25:37:58\" addrtype=\"mac\"/>\r\n<hostnames>\r\n<hostname name=\"RT-BE82U-3758\" type=\"PTR\"/>\r\n</hostnames>\r\n<times srtt=\"1000\" rttvar=\"5000\" to=\"100000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.5\" addrtype=\"ipv4\"/>\r\n<address addr=\"E8:38:A0:86:74:DB\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"63000\" rttvar=\"63000\" to=\"315000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.10\" addrtype=\"ipv4\"/>\r\n<address addr=\"68:9A:87:13:6F:37\" addrtype=\"mac\" vendor=\"Amazon Technologies\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"48000\" rttvar=\"48000\" to=\"240000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.27\" addrtype=\"ipv4\"/>\r\n<address addr=\"1E:DD:06:44:68:AA\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"91000\" rttvar=\"91000\" to=\"455000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.30\" addrtype=\"ipv4\"/>\r\n<address addr=\"08:27:A8:06:21:3A\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"92000\" rttvar=\"92000\" to=\"460000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.55\" addrtype=\"ipv4\"/>\r\n<address addr=\"84:C8:A0:CC:03:80\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"101000\" rttvar=\"101000\" to=\"505000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.64\" addrtype=\"ipv4\"/>\r\n<address addr=\"B6:5B:C0:40:2A:7F\" addrtype=\"mac\"/>\r\n<hostnames>\r\n<hostname name=\"iPad\" type=\"PTR\"/>\r\n</hostnames>\r\n<times srtt=\"36000\" rttvar=\"36000\" to=\"180000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.67\" addrtype=\"ipv4\"/>\r\n<address addr=\"C6:8D:D1:85:96:C3\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"49750\" rttvar=\"46250\" to=\"234750\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.165\" addrtype=\"ipv4\"/>\r\n<address addr=\"34:FC:99:97:C6:7C\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"133000\" rttvar=\"133000\" to=\"665000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.173\" addrtype=\"ipv4\"/>\r\n<address addr=\"3C:FA:06:CA:44:45\" addrtype=\"mac\"/>\r\n<hostnames>\r\n<hostname name=\"DADXBOX\" type=\"PTR\"/>\r\n</hostnames>\r\n<times srtt=\"1000\" rttvar=\"5000\" to=\"100000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.195\" addrtype=\"ipv4\"/>\r\n<address addr=\"4E:02:85:1C:B0:CB\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"74250\" rttvar=\"56000\" to=\"298250\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.199\" addrtype=\"ipv4\"/>\r\n<address addr=\"68:DB:F5:2E:D5:8F\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"94000\" rttvar=\"94000\" to=\"470000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.224\" addrtype=\"ipv4\"/>\r\n<address addr=\"F8:16:0C:75:9D:84\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"163000\" rttvar=\"163000\" to=\"815000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"localhost-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.175\" addrtype=\"ipv4\"/>\r\n<hostnames>\r\n<hostname name=\"host.docker.internal\" type=\"PTR\"/>\r\n</hostnames>\r\n</host>\r\n<runstats><finished time=\"1777320143\" timestr=\"Mon Apr 27 16:02:23 2026\" elapsed=\"6.62\" summary=\"Nmap done at Mon Apr 27 16:02:23 2026; 256 IP addresses (14 hosts up) scanned in 6.62 seconds\" exit=\"success\"/><hosts up=\"14\" down=\"242\" total=\"256\"/>\r\n</runstats>\r\n</nmaprun>\r\n",
+    "stderr": "",
+    "parsed": {
+      "hosts": [
+        {
+          "ip": "192.168.50.1",
+          "hostname": "RT-BE82U-3758",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.5",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.10",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.27",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.30",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.55",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.64",
+          "hostname": "iPad",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.67",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.165",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.173",
+          "hostname": "DADXBOX",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.195",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.199",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.224",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.175",
+          "hostname": "host.docker.internal",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        }
+      ],
+      "openPorts": [],
+      "summary": {
+        "hostsUp": 14,
+        "openPorts": 0
+      }
+    },
+    "findings": [],
+    "notes": "Authorized local lab scan"
+  },
+  {
+    "id": "scan-1777320074853",
+    "target": "127.0.0.1,192.168.50.100",
+    "modeId": "quick-discovery",
+    "modeName": "Quick Discovery",
+    "args": [
+      "-sn",
+      "-T3",
+      "-oX",
+      "-",
+      "127.0.0.1",
+      "192.168.50.100"
+    ],
+    "safeCommandPreview": "nmap -sn -T3 -oX - 127.0.0.1 192.168.50.100",
+    "status": "completed",
+    "startedAt": "2026-04-27T20:01:14.087Z",
+    "completedAt": "2026-04-27T20:01:14.852Z",
+    "durationMs": 765,
+    "rawOutput": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<!DOCTYPE nmaprun>\r\n<?xml-stylesheet href=\"file:///C:/Program Files (x86)/Nmap/nmap.xsl\" type=\"text/xsl\"?>\r\n<!-- Nmap 7.80 scan initiated Mon Apr 27 16:01:14 2026 as: &quot;C:\\\\Program Files (x86)\\\\Nmap\\\\nmap.exe&quot; -sn -T3 -oX - 127.0.0.1 192.168.50.100 -->\r\n<nmaprun scanner=\"nmap\" args=\"&quot;C:\\\\Program Files (x86)\\\\Nmap\\\\nmap.exe&quot; -sn -T3 -oX - 127.0.0.1 192.168.50.100\" start=\"1777320074\" startstr=\"Mon Apr 27 16:01:14 2026\" version=\"7.80\" xmloutputversion=\"1.04\">\r\n<verbose level=\"0\"/>\r\n<debugging level=\"0\"/>\r\n<host><status state=\"up\" reason=\"localhost-response\" reason_ttl=\"0\"/>\r\n<address addr=\"127.0.0.1\" addrtype=\"ipv4\"/>\r\n<hostnames>\r\n<hostname name=\"checkhost.local\" type=\"PTR\"/>\r\n</hostnames>\r\n</host>\r\n<runstats><finished time=\"1777320074\" timestr=\"Mon Apr 27 16:01:14 2026\" elapsed=\"0.75\" summary=\"Nmap done at Mon Apr 27 16:01:14 2026; 2 IP addresses (1 host up) scanned in 0.75 seconds\" exit=\"success\"/><hosts up=\"1\" down=\"1\" total=\"2\"/>\r\n</runstats>\r\n</nmaprun>\r\n",
+    "stderr": "",
+    "parsed": {
+      "hosts": [
+        {
+          "ip": "127.0.0.1",
+          "hostname": "checkhost.local",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        }
+      ],
+      "openPorts": [],
+      "summary": {
+        "hostsUp": 1,
+        "openPorts": 0
+      }
+    },
+    "findings": [],
+    "notes": "Authorized local lab scan"
+  },
+  {
+    "id": "scan-1777320054665",
+    "target": "192.168.50.0/24",
+    "modeId": "quick-discovery",
+    "modeName": "Quick Discovery",
+    "args": [
+      "-sn",
+      "-T3",
+      "-oX",
+      "-",
+      "192.168.50.0/24"
+    ],
+    "safeCommandPreview": "nmap -sn -T3 -oX - 192.168.50.0/24",
+    "status": "completed",
+    "startedAt": "2026-04-27T20:00:46.111Z",
+    "completedAt": "2026-04-27T20:00:54.663Z",
+    "durationMs": 8552,
+    "rawOutput": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<!DOCTYPE nmaprun>\r\n<?xml-stylesheet href=\"file:///C:/Program Files (x86)/Nmap/nmap.xsl\" type=\"text/xsl\"?>\r\n<!-- Nmap 7.80 scan initiated Mon Apr 27 16:00:46 2026 as: &quot;C:\\\\Program Files (x86)\\\\Nmap\\\\nmap.exe&quot; -sn -T3 -oX - 192.168.50.0/24 -->\r\n<nmaprun scanner=\"nmap\" args=\"&quot;C:\\\\Program Files (x86)\\\\Nmap\\\\nmap.exe&quot; -sn -T3 -oX - 192.168.50.0/24\" start=\"1777320046\" startstr=\"Mon Apr 27 16:00:46 2026\" version=\"7.80\" xmloutputversion=\"1.04\">\r\n<verbose level=\"0\"/>\r\n<debugging level=\"0\"/>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.1\" addrtype=\"ipv4\"/>\r\n<address addr=\"BC:FC:E7:25:37:58\" addrtype=\"mac\"/>\r\n<hostnames>\r\n<hostname name=\"RT-BE82U-3758\" type=\"PTR\"/>\r\n</hostnames>\r\n<times srtt=\"1000\" rttvar=\"5000\" to=\"100000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.5\" addrtype=\"ipv4\"/>\r\n<address addr=\"E8:38:A0:86:74:DB\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"69000\" rttvar=\"69000\" to=\"345000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.10\" addrtype=\"ipv4\"/>\r\n<address addr=\"68:9A:87:13:6F:37\" addrtype=\"mac\" vendor=\"Amazon Technologies\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"120000\" rttvar=\"120000\" to=\"600000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.27\" addrtype=\"ipv4\"/>\r\n<address addr=\"1E:DD:06:44:68:AA\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"116000\" rttvar=\"116000\" to=\"580000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.30\" addrtype=\"ipv4\"/>\r\n<address addr=\"08:27:A8:06:21:3A\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"112000\" rttvar=\"112000\" to=\"560000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.55\" addrtype=\"ipv4\"/>\r\n<address addr=\"84:C8:A0:CC:03:80\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"66000\" rttvar=\"66000\" to=\"330000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.64\" addrtype=\"ipv4\"/>\r\n<address addr=\"B6:5B:C0:40:2A:7F\" addrtype=\"mac\"/>\r\n<hostnames>\r\n<hostname name=\"iPad\" type=\"PTR\"/>\r\n</hostnames>\r\n<times srtt=\"107000\" rttvar=\"107000\" to=\"535000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.67\" addrtype=\"ipv4\"/>\r\n<address addr=\"C6:8D:D1:85:96:C3\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"115000\" rttvar=\"115000\" to=\"575000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.76\" addrtype=\"ipv4\"/>\r\n<address addr=\"6E:46:CA:A2:57:E6\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"91000\" rttvar=\"91000\" to=\"455000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.165\" addrtype=\"ipv4\"/>\r\n<address addr=\"34:FC:99:97:C6:7C\" addrtype=\"mac\"/>\r\n<hostnames>\r\n<hostname name=\"Samsung-Range\" type=\"PTR\"/>\r\n</hostnames>\r\n<times srtt=\"186000\" rttvar=\"186000\" to=\"930000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.173\" addrtype=\"ipv4\"/>\r\n<address addr=\"3C:FA:06:CA:44:45\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"0\" rttvar=\"5000\" to=\"100000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.195\" addrtype=\"ipv4\"/>\r\n<address addr=\"4E:02:85:1C:B0:CB\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"95000\" rttvar=\"95000\" to=\"475000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.199\" addrtype=\"ipv4\"/>\r\n<address addr=\"68:DB:F5:2E:D5:8F\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"87000\" rttvar=\"81750\" to=\"414000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.224\" addrtype=\"ipv4\"/>\r\n<address addr=\"F8:16:0C:75:9D:84\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"76000\" rttvar=\"76000\" to=\"380000\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"arp-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.242\" addrtype=\"ipv4\"/>\r\n<address addr=\"28:D5:B1:CF:8C:1D\" addrtype=\"mac\"/>\r\n<hostnames>\r\n</hostnames>\r\n<times srtt=\"108625\" rttvar=\"99000\" to=\"504625\"/>\r\n</host>\r\n<host><status state=\"up\" reason=\"localhost-response\" reason_ttl=\"0\"/>\r\n<address addr=\"192.168.50.175\" addrtype=\"ipv4\"/>\r\n<hostnames>\r\n<hostname name=\"host.docker.internal\" type=\"PTR\"/>\r\n</hostnames>\r\n</host>\r\n<runstats><finished time=\"1777320054\" timestr=\"Mon Apr 27 16:00:54 2026\" elapsed=\"8.53\" summary=\"Nmap done at Mon Apr 27 16:00:54 2026; 256 IP addresses (16 hosts up) scanned in 8.53 seconds\" exit=\"success\"/><hosts up=\"16\" down=\"240\" total=\"256\"/>\r\n</runstats>\r\n</nmaprun>\r\n",
+    "stderr": "",
+    "parsed": {
+      "hosts": [
+        {
+          "ip": "192.168.50.1",
+          "hostname": "RT-BE82U-3758",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.5",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.10",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.27",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.30",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.55",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.64",
+          "hostname": "iPad",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.67",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.76",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.165",
+          "hostname": "Samsung-Range",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.173",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.195",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.199",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.224",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.242",
+          "hostname": "",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        },
+        {
+          "ip": "192.168.50.175",
+          "hostname": "host.docker.internal",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        }
+      ],
+      "openPorts": [],
+      "summary": {
+        "hostsUp": 16,
+        "openPorts": 0
+      }
+    },
+    "findings": [],
+    "notes": "Authorized local lab scan"
+  },
+  {
+    "id": "scan-1777320014592",
+    "target": "127.0.0.1",
+    "modeId": "quick-discovery",
+    "modeName": "Quick Discovery",
+    "args": [
+      "-sn",
+      "-T3",
+      "-oX",
+      "-",
+      "127.0.0.1"
+    ],
+    "safeCommandPreview": "nmap -sn -T3 -oX - 127.0.0.1",
+    "status": "completed",
+    "startedAt": "2026-04-27T20:00:14.266Z",
+    "completedAt": "2026-04-27T20:00:14.589Z",
+    "durationMs": 323,
+    "rawOutput": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<!DOCTYPE nmaprun>\r\n<?xml-stylesheet href=\"file:///C:/Program Files (x86)/Nmap/nmap.xsl\" type=\"text/xsl\"?>\r\n<!-- Nmap 7.80 scan initiated Mon Apr 27 16:00:14 2026 as: &quot;C:\\\\Program Files (x86)\\\\Nmap\\\\nmap.exe&quot; -sn -T3 -oX - 127.0.0.1 -->\r\n<nmaprun scanner=\"nmap\" args=\"&quot;C:\\\\Program Files (x86)\\\\Nmap\\\\nmap.exe&quot; -sn -T3 -oX - 127.0.0.1\" start=\"1777320014\" startstr=\"Mon Apr 27 16:00:14 2026\" version=\"7.80\" xmloutputversion=\"1.04\">\r\n<verbose level=\"0\"/>\r\n<debugging level=\"0\"/>\r\n<host><status state=\"up\" reason=\"localhost-response\" reason_ttl=\"0\"/>\r\n<address addr=\"127.0.0.1\" addrtype=\"ipv4\"/>\r\n<hostnames>\r\n<hostname name=\"checkhost.local\" type=\"PTR\"/>\r\n</hostnames>\r\n</host>\r\n<runstats><finished time=\"1777320014\" timestr=\"Mon Apr 27 16:00:14 2026\" elapsed=\"0.30\" summary=\"Nmap done at Mon Apr 27 16:00:14 2026; 1 IP address (1 host up) scanned in 0.30 seconds\" exit=\"success\"/><hosts up=\"1\" down=\"0\" total=\"1\"/>\r\n</runstats>\r\n</nmaprun>\r\n",
+    "stderr": "",
+    "parsed": {
+      "hosts": [
+        {
+          "ip": "127.0.0.1",
+          "hostname": "checkhost.local",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        }
+      ],
+      "openPorts": [],
+      "summary": {
+        "hostsUp": 1,
+        "openPorts": 0
+      }
+    },
+    "findings": [],
+    "notes": "Authorized local lab scan"
+  },
+  {
+    "id": "scan-1777319973128",
+    "target": "127.0.0.1",
+    "modeId": "basic-tcp",
+    "modeName": "Basic TCP Scan",
+    "args": [
+      "-sT",
+      "-p",
+      "22,80,443,3389",
+      "-T3",
+      "-oX",
+      "-",
+      "127.0.0.1"
+    ],
+    "safeCommandPreview": "nmap -sT -p 22,80,443,3389 -T3 -oX - 127.0.0.1",
+    "status": "completed",
+    "startedAt": "2026-04-27T19:59:29.751Z",
+    "completedAt": "2026-04-27T19:59:33.125Z",
+    "durationMs": 3374,
+    "rawOutput": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<!DOCTYPE nmaprun>\r\n<?xml-stylesheet href=\"file:///C:/Program Files (x86)/Nmap/nmap.xsl\" type=\"text/xsl\"?>\r\n<!-- Nmap 7.80 scan initiated Mon Apr 27 15:59:29 2026 as: &quot;C:\\\\Program Files (x86)\\\\Nmap\\\\nmap.exe&quot; -sT -p 22,80,443,3389 -T3 -oX - 127.0.0.1 -->\r\n<nmaprun scanner=\"nmap\" args=\"&quot;C:\\\\Program Files (x86)\\\\Nmap\\\\nmap.exe&quot; -sT -p 22,80,443,3389 -T3 -oX - 127.0.0.1\" start=\"1777319969\" startstr=\"Mon Apr 27 15:59:29 2026\" version=\"7.80\" xmloutputversion=\"1.04\">\r\n<scaninfo type=\"connect\" protocol=\"tcp\" numservices=\"4\" services=\"22,80,443,3389\"/>\r\n<verbose level=\"0\"/>\r\n<debugging level=\"0\"/>\r\n<host starttime=\"1777319970\" endtime=\"1777319973\"><status state=\"up\" reason=\"localhost-response\" reason_ttl=\"0\"/>\r\n<address addr=\"127.0.0.1\" addrtype=\"ipv4\"/>\r\n<hostnames>\r\n<hostname name=\"checkhost.local\" type=\"PTR\"/>\r\n</hostnames>\r\n<ports><port protocol=\"tcp\" portid=\"22\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ssh\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"80\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"http\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"443\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"https\" method=\"table\" conf=\"3\"/></port>\r\n<port protocol=\"tcp\" portid=\"3389\"><state state=\"filtered\" reason=\"no-response\" reason_ttl=\"0\"/><service name=\"ms-wbt-server\" method=\"table\" conf=\"3\"/></port>\r\n</ports>\r\n</host>\r\n<runstats><finished time=\"1777319973\" timestr=\"Mon Apr 27 15:59:33 2026\" elapsed=\"3.35\" summary=\"Nmap done at Mon Apr 27 15:59:33 2026; 1 IP address (1 host up) scanned in 3.35 seconds\" exit=\"success\"/><hosts up=\"1\" down=\"0\" total=\"1\"/>\r\n</runstats>\r\n</nmaprun>\r\n",
+    "stderr": "",
+    "parsed": {
+      "hosts": [
+        {
+          "ip": "127.0.0.1",
+          "hostname": "checkhost.local",
+          "status": "up",
+          "osGuess": "",
+          "ports": []
+        }
+      ],
+      "openPorts": [],
+      "summary": {
+        "hostsUp": 1,
+        "openPorts": 0
+      }
+    },
+    "findings": [],
+    "notes": "Authorized local lab scan"
+  }
+]
